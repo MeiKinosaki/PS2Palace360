@@ -1,22 +1,24 @@
 CC ?= cc
 CFLAGS ?= -std=c11 -Wall -Wextra -Werror -pedantic -O2
 BUILD_DIR := build
-EE_SOURCES := src/ps2/ee_state.c
+EE_SOURCES := src/ps2/ee_state.c src/ps2/ee_ops.c
 HOST_TEST := $(BUILD_DIR)/test_ee_state
 
 .PHONY: all validate test-host check xex clean
 
-all: validate test-host
+all: check
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(HOST_TEST): $(EE_SOURCES) tests/test_ee_state.c src/ps2/ee_state.h | $(BUILD_DIR)
+$(HOST_TEST): $(EE_SOURCES) tests/test_ee_state.c src/ps2/ee_state.h src/ps2/ee_ops.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -Isrc/ps2 $(EE_SOURCES) tests/test_ee_state.c -o $@
 
 validate:
 	@test -f src/ps2/ee_state.h
 	@test -f src/ps2/ee_state.c
+	@test -f src/ps2/ee_ops.h
+	@test -f src/ps2/ee_ops.c
 	@test -f tests/test_ee_state.c
 	@echo "OK: estrutura minima do PS2Palace360 presente."
 
