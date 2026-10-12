@@ -2,6 +2,7 @@
 #include "../src/ps2/ee_ops.h"
 #include "../src/ps2/ee_immediate.h"
 #include "../src/ps2/ee_compare.h"
+#include "../src/ps2/ee_decode.h"
 
 #include <assert.h>
 #include <stdint.h>
@@ -54,6 +55,15 @@ int main(void)
     s.gpr[2] = 0;
     assert(ps2_ee_movn(&s, 22, 1, 2) == 0 && s.gpr[22] == s.gpr[3]);
 
+    /* R-type ADDU r3,r1,r2 then ADDI r4,r1,-5 */
+    s.gpr[1] = 40; s.gpr[2] = 2;
+    assert(ps2_ee_execute_word(&s, (1u << 21) | (2u << 16) | (3u << 11) | 0x21u) == PS2_EE_STEP_OK);
+    assert(s.gpr[3] == 42);
+    assert(ps2_ee_execute_word(&s, (0x08u << 26) | (1u << 21) | (4u << 16) | 0xfffbu) == PS2_EE_STEP_OK);
+    assert((int64_t)s.gpr[4] == 35);
+    assert(ps2_ee_execute_word(&s, 0xffffffffu) == PS2_EE_STEP_UNSUPPORTED);
+    assert(ps2_ee_execute_word(NULL, 0u) == PS2_EE_STEP_INVALID);
+
     assert(ps2_ee_add32(&s, 0, 1, 2) == 0 && s.gpr[0] == 0);
     assert(ps2_ee_add32(&s, 32, 1, 2) == -1);
     assert(ps2_ee_sub32(NULL, 1, 1, 2) == -1);
@@ -61,6 +71,6 @@ int main(void)
     assert(ps2_ee_lui(&s, 32, 0) == -1);
     assert(ps2_ee_slt64(&s, 32, 1, 2) == -1);
 
-    puts("OK: EE arithmetic, logic, immediates, comparisons, conditional moves and bounds.");
+    puts("OK: EE arithmetic, comparisons, immediate ops and decoder dispatch.");
     return 0;
 }
