@@ -4,9 +4,9 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Estado atual
 
-A base inicial inclui estado do Emotion Engine (EE), operações aritméticas de 32 bits, operações lógicas de 64 bits, instruções imediatas e testes nativos.
+A base inicial inclui estado do Emotion Engine (EE), operações aritméticas de 32 bits, operações lógicas de 64 bits, instruções imediatas, comparações entre registradores e movimentos condicionais, além de testes nativos.
 
-Instruções auxiliares atualmente implementadas: `ADD`, `SUB`, `ADDU`, `SUBU`, `AND`, `OR`, `XOR`, `NOR`, `ADDI`, `ADDIU`, `SLTI`, `SLTIU` e `LUI`. Elas são funções de apoio testáveis; ainda não existe um decodificador/loop completo que execute programas PS2.
+Funções auxiliares atualmente implementadas: `ADD`, `SUB`, `ADDU`, `SUBU`, `AND`, `OR`, `XOR`, `NOR`, `ADDI`, `ADDIU`, `SLTI`, `SLTIU`, `LUI`, `SLT`, `SLTU`, `MOVZ` e `MOVN`. Elas são funções de apoio testáveis; ainda não existe um decodificador/loop completo que execute programas PS2.
 
 **Ainda não é um emulador funcional de PS2.** O núcleo R5900 está incompleto e os subsistemas IOP, DMA, VU, GS, BIOS boot, áudio, vídeo e entrada ainda precisam ser implementados e integrados. Não há um `default.xex` confirmado.
 
