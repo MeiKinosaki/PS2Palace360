@@ -1,0 +1,95 @@
+name: PS2Palace360 - Cloud Toolchain
+
+on:
+  workflow_dispatch:
+    inputs:
+      toolchain_image:
+        description: 'Docker image containing libXenon SDK and elf2xex'
+        required: true
+        default: 'free60/libxenon:latest'
+        type: string
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ps2palace360-cloud-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  inspect:
+    name: Inspect project and toolchain
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check repository inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Repository: ${GITHUB_REPOSITORY}"
+          echo "Commit: ${GITHUB_SHA}"
+          echo "Files currently tracked:"
+          git ls-files
+          if [[ ! -f Makefile ]]; then
+            echo "::warning::No Makefile found yet. Xbox build cannot start until the project sources and build scripts are committed."
+          fi
+      - name: Verify Docker availability
+        run: docker --version
+
+  xenon-build:
+    name: Xbox 360 build (libXenon)
+    runs-on: ubuntu-latest
+    needs: inspect
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull configured toolchain image
+        env:
+          TOOLCHAIN_IMAGE: ${{ inputs.toolchain_image || 'free60/libxenon:latest' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Selected image: ${TOOLCHAIN_IMAGE}"
+          docker pull "${TOOLCHAIN_IMAGE}"
+      - name: Build and validate XEX
+        env:
+          TOOLCHAIN_IMAGE: ${{ inputs.toolchain_image || 'free60/libxenon:latest' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -e CI=true \
+            -v "${PWD}:/workspace" -w /workspace \
+            "${TOOLCHAIN_IMAGE}" sh -lc '
+              set -eu
+              echo "== Toolchain binaries =="
+              for tool in xenon-gcc xenon-ld elf2xex make; do
+                if command -v "$tool" >/dev/null 2>&1; then
+                  printf "%s: %s\n" "$tool" "$(command -v "$tool")"
+                else
+                  echo "ERROR: required tool missing: $tool"
+                  exit 20
+                fi
+              done
+              test -f Makefile || { echo "ERROR: repository has no Makefile yet"; exit 21; }
+              make clean
+              make validate
+              make check
+              make xex
+              test -s build/Xenon.elf
+              test -s build/default.xex
+              sha256sum build/Xenon.elf build/default.xex > build/SHA256SUMS.txt
+              cat build/SHA256SUMS.txt
+            '
+      - name: Upload verified build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PS2Palace360-X2.10-${{ github.run_number }}
+          path: |
+            build/Xenon.elf
+            build/default.xex
+            build/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
