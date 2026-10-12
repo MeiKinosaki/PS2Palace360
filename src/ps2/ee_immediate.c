@@ -1,5 +1,6 @@
 #include "ee_immediate.h"
 
+#include <limits.h>
 #include <stddef.h>
 
 static int valid(const ps2_ee_state_t *s, unsigned rt, unsigned rs)
