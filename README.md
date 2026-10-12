@@ -4,11 +4,11 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Estado atual
 
-A base inicial inclui estado do Emotion Engine (EE), operações aritméticas de 32 bits, operações lógicas de 64 bits, instruções imediatas, comparações entre registradores e movimentos condicionais, além de testes nativos.
+A base inclui estado do Emotion Engine (EE), helpers aritméticos e lógicos, operações imediatas, comparações, movimentos condicionais e um primeiro despachante de instruções de 32 bits.
 
-Funções auxiliares atualmente implementadas: `ADD`, `SUB`, `ADDU`, `SUBU`, `AND`, `OR`, `XOR`, `NOR`, `ADDI`, `ADDIU`, `SLTI`, `SLTIU`, `LUI`, `SLT`, `SLTU`, `MOVZ` e `MOVN`. Elas são funções de apoio testáveis; ainda não existe um decodificador/loop completo que execute programas PS2.
+O módulo `src/ps2/ee_decode.c` decodifica um subconjunto de instruções R-type (`ADD`, `ADDU`, `SUB`, `SUBU`, `AND`, `OR`, `XOR`, `NOR`, `SLT`, `SLTU`, `MOVZ`, `MOVN`) e imediatas (`ADDI`, `ADDIU`, `SLTI`, `SLTIU`, `LUI`). Os testes incluem palavras de instrução codificadas e verificam o resultado do despachante.
 
-**Ainda não é um emulador funcional de PS2.** O núcleo R5900 está incompleto e os subsistemas IOP, DMA, VU, GS, BIOS boot, áudio, vídeo e entrada ainda precisam ser implementados e integrados. Não há um `default.xex` confirmado.
+**Limitações importantes:** ainda não existe loop de busca/execução, avanço arquitetural do PC, tratamento correto de exceções de overflow, branches/delay slots completos, MMU/TLB, nem suporte completo às instruções MIPS III/R5900 e extensões do Emotion Engine. Portanto, ainda não executa programas PS2 nem constitui um emulador funcional.
 
 ## Validação na nuvem
 
