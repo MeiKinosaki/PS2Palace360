@@ -1,5 +1,6 @@
 #include "../src/ps2/ee_state.h"
 #include "../src/ps2/ee_ops.h"
+#include "../src/ps2/ee_immediate.h"
 
 #include <assert.h>
 #include <stdint.h>
@@ -41,12 +42,26 @@ int main(void)
     assert(ps2_ee_logic(&s, 11, 1, 2, PS2_EE_LOGIC_NOR) == 0);
     assert(s.gpr[11] == ~UINT64_C(0xFFF0));
 
+    s.gpr[1] = 100;
+    assert(ps2_ee_addi32(&s, 12, 1, -7) == 0);
+    assert((int64_t)s.gpr[12] == 93);
+    assert(ps2_ee_addiu32(&s, 13, 1, -7) == 0);
+    assert((int64_t)s.gpr[13] == 93);
+    assert(ps2_ee_slti64(&s, 14, 1, 101) == 0 && s.gpr[14] == 1);
+    assert(ps2_ee_slti64(&s, 15, 1, 99) == 0 && s.gpr[15] == 0);
+    assert(ps2_ee_sltiu64(&s, 16, 1, -1) == 0 && s.gpr[16] == 1);
+    assert(ps2_ee_lui(&s, 17, UINT16_C(0x1234)) == 0);
+    assert((uint32_t)s.gpr[17] == UINT32_C(0x12340000));
+    s.gpr[1] = UINT32_C(0x7fffffff);
+    assert(ps2_ee_addi32(&s, 18, 1, 1) == 1);
+
     assert(ps2_ee_add32(&s, 0, 1, 2) == 0);
     assert(s.gpr[0] == 0);
     assert(ps2_ee_add32(&s, 32, 1, 2) == -1);
     assert(ps2_ee_sub32(NULL, 1, 1, 2) == -1);
     assert(ps2_ee_logic(&s, 1, 1, 2, 9u) == -1);
+    assert(ps2_ee_lui(&s, 32, 0) == -1);
 
-    puts("OK: EE reset, signed/unsigned arithmetic, logic, overflow and bounds.");
+    puts("OK: EE arithmetic, logic, immediate operations, overflow and bounds.");
     return 0;
 }
