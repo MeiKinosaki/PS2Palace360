@@ -64,6 +64,8 @@ int main(void)
     assert(ps2_ee_execute_word(&s, (0x0eu << 26) | (2u << 21) | (7u << 16) | 0x00ffu) == PS2_EE_STEP_OK && s.gpr[7] == 0x12cbu);
     s.gpr[2] = 3;
     assert(ps2_ee_execute_word(&s, (2u << 16) | (3u << 11) | (2u << 6)) == PS2_EE_STEP_OK && s.gpr[3] == 12);
+    assert(ps2_ee_execute_word(&s, (0x04u << 26) | 2u) == PS2_EE_STEP_OK);
+    assert(s.next_pc == s.pc + 12u);
     assert(ps2_ee_execute_word(&s, 0xffffffffu) == PS2_EE_STEP_UNSUPPORTED);
     assert(ps2_ee_execute_word(NULL, 0u) == PS2_EE_STEP_INVALID);
 
@@ -84,12 +86,25 @@ int main(void)
     s.gpr[1] = 3;
     assert(ps2_ee_execute_memory_word(&s, &mem, (0x23u << 26) | (1u << 21) | (5u << 16)) == PS2_EE_STEP_INVALID);
 
+    /* Step loop: execute ADDIU from RAM and preserve branch delay slot. */
+    ps2_ee_reset(&s); s.pc = 0; s.next_pc = 4;
+    assert(ps2_ee_mem_store(&mem, 0, 4, (0x09u << 26) | (1u << 16) | 7u) == 0);
+    assert(ps2_ee_step(&s, &mem) == PS2_EE_STEP_OK);
+    assert(s.gpr[1] == 7 && s.pc == 4 && s.next_pc == 8);
+    ps2_ee_reset(&s); s.pc = 0; s.next_pc = 4;
+    assert(ps2_ee_mem_store(&mem, 0, 4, (0x04u << 26) | 2u) == 0); /* BEQ r0,r0,+2 */
+    assert(ps2_ee_mem_store(&mem, 4, 4, (0x09u << 26) | (2u << 16) | 9u) == 0); /* delay slot */
+    assert(ps2_ee_step(&s, &mem) == PS2_EE_STEP_OK);
+    assert(s.pc == 4 && s.next_pc == 12);
+    assert(ps2_ee_step(&s, &mem) == PS2_EE_STEP_OK);
+    assert(s.gpr[2] == 9 && s.pc == 12 && s.next_pc == 16);
+
     assert(ps2_ee_add32(&s, 0, 1, 2) == 0 && s.gpr[0] == 0);
     assert(ps2_ee_add32(&s, 32, 1, 2) == -1);
     assert(ps2_ee_sub32(NULL, 1, 1, 2) == -1);
     assert(ps2_ee_logic(&s, 1, 1, 2, 9u) == -1);
     assert(ps2_ee_lui(&s, 32, 0) == -1);
     assert(ps2_ee_slt64(&s, 32, 1, 2) == -1);
-    puts("OK: EE helpers, unified decoder, shifts and memory operations.");
+    puts("OK: EE helpers, decoder, memory operations, step and branch delay slot.");
     return 0;
 }
