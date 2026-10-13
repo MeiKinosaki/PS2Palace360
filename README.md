@@ -4,11 +4,13 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Estado atual
 
-A base inclui estado do Emotion Engine (EE), helpers aritméticos e lógicos, comparações, movimentos condicionais, um decodificador inicial e um buffer de RAM de teste.
+A base inclui estado do Emotion Engine (EE), operações aritméticas/lógicas parciais, comparações, movimentos condicionais, decodificação de um subconjunto MIPS e buffer de RAM de teste.
 
-`ps2_ee_execute_word()` trata um subconjunto de operações R-type (incluindo deslocamentos fixos/variáveis), operações imediatas aritméticas/lógicas (`ADDI`, `ADDIU`, `SLTI`, `SLTIU`, `ANDI`, `ORI`, `XORI`, `LUI`) e comparações/movimentos condicionais. `ps2_ee_execute_memory_word()` trata `LB`, `LBU`, `LH`, `LHU`, `LW`, `LWU`, `LD`, `SB`, `SH`, `SW` e `SD`; outras instruções encaminham para o decodificador aritmético.
+`ps2_ee_execute_word()` inclui instruções R-type e imediatas, deslocamentos, operações lógicas imediatas, saltos e desvios básicos (`J`, `JAL`, `JR`, `JALR`, `BEQ`, `BNE`, `BLEZ`, `BGTZ`). `ps2_ee_execute_memory_word()` inclui `LB`, `LBU`, `LH`, `LHU`, `LW`, `LWU`, `LD`, `SB`, `SH`, `SW` e `SD`. `ps2_ee_step()` busca uma instrução no buffer, avança o estado PC/next-PC e despacha a instrução; os desvios básicos agendam o destino para depois da instrução de delay slot.
 
-A memória é apenas um buffer genérico little-endian para testes, não o mapa real do PS2. O executor ainda não é um ciclo completo de busca/execução: não atualiza PC, não trata branches/delay slots ou exceções completas e não inclui MMU/TLB. O suporte MIPS III/R5900 e extensões específicas do Emotion Engine é incompleto. Portanto, o projeto ainda não executa jogos de PS2.
+## Limitações importantes
+
+Este é um protótipo de execução, não um emulador funcional. O buffer de RAM é genérico e não representa o mapa real de memória do PS2. O ciclo de execução ainda não modela corretamente todas as regras MIPS/R5900; exceções, overflow arquitetural, branch-likely, estados de delay-slot para exceções, MMU/TLB e instruções de 64 bits específicas ainda estão incompletos. IOP, DMA, VU, GS, áudio, controles e mídia não estão integrados. Não há inicialização de jogos comprovada.
 
 ## Validação na nuvem
 
@@ -21,7 +23,7 @@ A memória é apenas um buffer genérico little-endian para testes, não o mapa 
     make validate
     make test-host
 
-O alvo `xex` ainda não produz um executável; requer toolchain libXenon validada, entrypoint de Xbox 360 e comando `elf2xex` verificado.
+O alvo `xex` ainda não produz um executável. Ele requer toolchain libXenon validada, entrypoint Xbox 360 e comando `elf2xex` verificado.
 
 ## BIOS
 
