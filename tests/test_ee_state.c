@@ -3,14 +3,19 @@
 #include "../src/ps2/ee_immediate.h"
 #include "../src/ps2/ee_compare.h"
 #include "../src/ps2/ee_decode.h"
+#include "../src/ps2/ee_memory.h"
 
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 int main(void)
 {
     ps2_ee_state_t s;
+    uint8_t ram[64] = {0};
+    ps2_ee_memory_t mem = {ram, sizeof ram};
+    uint64_t loaded = 0;
     ps2_ee_reset(&s);
     assert(s.pc == UINT32_C(0xBFC00000));
     assert(s.next_pc == UINT32_C(0xBFC00004));
@@ -55,7 +60,6 @@ int main(void)
     s.gpr[2] = 0;
     assert(ps2_ee_movn(&s, 22, 1, 2) == 0 && s.gpr[22] == s.gpr[3]);
 
-    /* R-type ADDU r3,r1,r2 then ADDI r4,r1,-5 */
     s.gpr[1] = 40; s.gpr[2] = 2;
     assert(ps2_ee_execute_word(&s, (1u << 21) | (2u << 16) | (3u << 11) | 0x21u) == PS2_EE_STEP_OK);
     assert(s.gpr[3] == 42);
@@ -64,6 +68,16 @@ int main(void)
     assert(ps2_ee_execute_word(&s, 0xffffffffu) == PS2_EE_STEP_UNSUPPORTED);
     assert(ps2_ee_execute_word(NULL, 0u) == PS2_EE_STEP_INVALID);
 
+    assert(ps2_ee_mem_store(&mem, 4, 4, UINT32_C(0x1234abcd)) == 0);
+    assert(ram[4] == 0xcdu && ram[5] == 0xabu && ram[6] == 0x34u && ram[7] == 0x12u);
+    assert(ps2_ee_mem_load(&mem, 4, 4, &loaded) == 0 && loaded == UINT32_C(0x1234abcd));
+    assert(ps2_ee_mem_store(&mem, 8, 8, UINT64_C(0x1122334455667788)) == 0);
+    assert(ps2_ee_mem_load(&mem, 8, 8, &loaded) == 0 && loaded == UINT64_C(0x1122334455667788));
+    assert(ps2_ee_mem_load(&mem, 3, 4, &loaded) == -1);
+    assert(ps2_ee_mem_load(&mem, 64, 1, &loaded) == -1);
+    assert(ps2_ee_mem_store(&mem, 0, 3, 0) == -1);
+    assert(ps2_ee_mem_load(&mem, 0, 1, NULL) == -1);
+
     assert(ps2_ee_add32(&s, 0, 1, 2) == 0 && s.gpr[0] == 0);
     assert(ps2_ee_add32(&s, 32, 1, 2) == -1);
     assert(ps2_ee_sub32(NULL, 1, 1, 2) == -1);
@@ -71,6 +85,6 @@ int main(void)
     assert(ps2_ee_lui(&s, 32, 0) == -1);
     assert(ps2_ee_slt64(&s, 32, 1, 2) == -1);
 
-    puts("OK: EE arithmetic, comparisons, immediate ops and decoder dispatch.");
+    puts("OK: EE operations, decoder dispatch and bounded memory access.");
     return 0;
 }
