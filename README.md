@@ -6,9 +6,9 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 A base inclui estado do Emotion Engine (EE), helpers aritméticos e lógicos, operações imediatas, comparações, movimentos condicionais, um despachante inicial de instruções e um módulo de acesso a memória RAM de teste.
 
-O módulo `src/ps2/ee_decode.c` decodifica um subconjunto de instruções R-type e imediatas. `src/ps2/ee_memory.c` fornece leituras e gravações little-endian de 8, 16, 32 e 64 bits sobre um buffer de RAM fornecido pelo chamador, verificando alinhamento e limites.
+O módulo `src/ps2/ee_decode.c` decodifica um subconjunto de instruções R-type e imediatas. A interface `ps2_ee_execute_memory_word()` também executa um subconjunto de loads/stores usando `src/ps2/ee_memory.c`: `LB`, `LBU`, `LH`, `LHU`, `LW`, `LWU`, `LD`, `SB`, `SH`, `SW` e `SD`, com endereços calculados por base + imediato com sinal. Os testes cobrem leitura/escrita decodificada, extensão de sinal para `LW` e endereços desalinhados.
 
-**Limitações importantes:** o módulo de memória é apenas um buffer genérico de testes, não o mapa de memória real do PS2. Ainda não existe loop completo de busca/execução, avanço arquitetural do PC, tratamento completo de exceções/overflow, branches e delay slots completos, MMU/TLB, nem suporte integral às instruções MIPS III/R5900 e extensões do Emotion Engine. O projeto ainda não executa jogos de PS2 e não é um emulador funcional.
+**Limitações importantes:** o módulo de memória é apenas um buffer genérico de testes, não o mapa real do PS2. A interface de memória é separada do executor geral; loads/stores ainda não são despachados por `ps2_ee_execute_word()`. Ainda não existe loop completo de busca/execução, avanço arquitetural do PC, tratamento completo de exceções/overflow, branches e delay slots completos, MMU/TLB, nem suporte integral às instruções MIPS III/R5900 e extensões do Emotion Engine. O projeto ainda não executa jogos de PS2 e não é um emulador funcional.
 
 ## Validação na nuvem
 
