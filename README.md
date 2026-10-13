@@ -4,26 +4,19 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Estado atual
 
-A base inclui estado do Emotion Engine (EE), operações aritméticas/lógicas parciais, comparações, movimentos condicionais, decodificação de um subconjunto MIPS e buffer de RAM de teste.
+O protótipo contém estado básico do Emotion Engine (EE), decodificador parcial, operações aritméticas/lógicas, cargas/gravações e uma função inicial de passo de execução.
 
-`ps2_ee_execute_word()` inclui instruções R-type e imediatas, deslocamentos, operações lógicas imediatas, saltos e desvios básicos (`J`, `JAL`, `JR`, `JALR`, `BEQ`, `BNE`, `BLEZ`, `BGTZ`). `ps2_ee_execute_memory_word()` inclui `LB`, `LBU`, `LH`, `LHU`, `LW`, `LWU`, `LD`, `SB`, `SH`, `SW` e `SD`. `ps2_ee_step()` busca uma instrução no buffer, avança o estado PC/next-PC e despacha a instrução; os desvios básicos agendam o destino para depois da instrução de delay slot.
+A última expansão acrescenta operações HI/LO (`MFHI`, `MTHI`, `MFLO`, `MTLO`), multiplicação/divisão de 32 bits (`MULT`, `MULTU`, `DIV`, `DIVU`) e deslocamentos de 64 bits (`DSLL`, `DSRL`, `DSRA`). Também existem instruções básicas de salto/desvio e um buffer de RAM de teste.
 
 ## Limitações importantes
 
-Este é um protótipo de execução, não um emulador funcional. O buffer de RAM é genérico e não representa o mapa real de memória do PS2. O ciclo de execução ainda não modela corretamente todas as regras MIPS/R5900; exceções, overflow arquitetural, branch-likely, estados de delay-slot para exceções, MMU/TLB e instruções de 64 bits específicas ainda estão incompletos. IOP, DMA, VU, GS, áudio, controles e mídia não estão integrados. Não há inicialização de jogos comprovada.
+Este projeto ainda é um protótipo, não um emulador funcional de PS2. A semântica completa do MIPS III/R5900 não está implementada; há instruções de 64 bits ausentes, estados de exceção incompletos, nenhum MMU/TLB e tratamento parcial de delay slots. A função de passo ainda precisa de mais testes de borda e integração arquitetural. O buffer de RAM não representa o mapa real de memória do PS2. IOP, DMA, VU, GS, áudio, controles, mídia e boot de jogos ainda não estão integrados.
 
 ## Validação na nuvem
 
-1. Abra **Actions** e execute **PS2Palace360 - Cloud Toolchain**.
-2. A workflow de host deve executar `make validate` e `make test-host`.
-3. A compilação Xbox 360 exige um runner configurado com libXenon; o runner padrão do GitHub não inclui `xenon-gcc` automaticamente.
+Abra **Actions** e execute **PS2Palace360 - Cloud Toolchain**. Os testes de host usam `make validate` e `make test-host`. A compilação Xbox 360 requer runner configurado com libXenon; o runner GitHub padrão não fornece automaticamente `xenon-gcc`.
 
-## Testes de host
-
-    make validate
-    make test-host
-
-O alvo `xex` ainda não produz um executável. Ele requer toolchain libXenon validada, entrypoint Xbox 360 e comando `elf2xex` verificado.
+O `default.xex` ainda não foi confirmado. É necessário configurar a toolchain real, o entrypoint do Xbox 360 e a conversão ELF-to-XEX.
 
 ## BIOS
 
