@@ -4,11 +4,9 @@
 #include "../src/ps2/ee_compare.h"
 #include "../src/ps2/ee_decode.h"
 #include "../src/ps2/ee_memory.h"
-
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 
 int main(void)
 {
@@ -17,8 +15,7 @@ int main(void)
     ps2_ee_memory_t mem = {ram, sizeof ram};
     uint64_t loaded = 0;
     ps2_ee_reset(&s);
-    assert(s.pc == UINT32_C(0xBFC00000));
-    assert(s.next_pc == UINT32_C(0xBFC00004));
+    assert(s.pc == UINT32_C(0xBFC00000) && s.next_pc == UINT32_C(0xBFC00004));
     assert(s.gpr[0] == 0);
 
     s.gpr[1] = 20; s.gpr[2] = 22;
@@ -29,7 +26,6 @@ int main(void)
     assert(ps2_ee_add32(&s, 5, 1, 2) == 1);
     s.gpr[1] = UINT32_C(0x80000000); s.gpr[2] = 1;
     assert(ps2_ee_sub32(&s, 5, 1, 2) == 1);
-
     s.gpr[1] = UINT32_MAX; s.gpr[2] = 2;
     assert(ps2_ee_addu32(&s, 6, 1, 2) == 0 && (uint32_t)s.gpr[6] == 1u);
     assert(ps2_ee_subu32(&s, 7, 2, 1) == 0 && (uint32_t)s.gpr[7] == 3u);
@@ -69,7 +65,6 @@ int main(void)
     assert(ps2_ee_execute_word(NULL, 0u) == PS2_EE_STEP_INVALID);
 
     assert(ps2_ee_mem_store(&mem, 4, 4, UINT32_C(0x1234abcd)) == 0);
-    assert(ram[4] == 0xcdu && ram[5] == 0xabu && ram[6] == 0x34u && ram[7] == 0x12u);
     assert(ps2_ee_mem_load(&mem, 4, 4, &loaded) == 0 && loaded == UINT32_C(0x1234abcd));
     assert(ps2_ee_mem_store(&mem, 8, 8, UINT64_C(0x1122334455667788)) == 0);
     assert(ps2_ee_mem_load(&mem, 8, 8, &loaded) == 0 && loaded == UINT64_C(0x1122334455667788));
@@ -78,13 +73,21 @@ int main(void)
     assert(ps2_ee_mem_store(&mem, 0, 3, 0) == -1);
     assert(ps2_ee_mem_load(&mem, 0, 1, NULL) == -1);
 
+    s.gpr[1] = 8;
+    assert(ps2_ee_execute_memory_word(&s, &mem, (0x23u << 26) | (1u << 21) | (5u << 16)) == PS2_EE_STEP_OK);
+    assert(s.gpr[5] == UINT64_C(0x55667788));
+    s.gpr[6] = UINT64_C(0xaabbccdd);
+    assert(ps2_ee_execute_memory_word(&s, &mem, (0x2bu << 26) | (1u << 21) | (6u << 16) | 16u) == PS2_EE_STEP_OK);
+    assert(ps2_ee_mem_load(&mem, 24, 4, &loaded) == 0 && loaded == UINT32_C(0xaabbccdd));
+    s.gpr[1] = 3;
+    assert(ps2_ee_execute_memory_word(&s, &mem, (0x23u << 26) | (1u << 21) | (5u << 16)) == PS2_EE_STEP_INVALID);
+
     assert(ps2_ee_add32(&s, 0, 1, 2) == 0 && s.gpr[0] == 0);
     assert(ps2_ee_add32(&s, 32, 1, 2) == -1);
     assert(ps2_ee_sub32(NULL, 1, 1, 2) == -1);
     assert(ps2_ee_logic(&s, 1, 1, 2, 9u) == -1);
     assert(ps2_ee_lui(&s, 32, 0) == -1);
     assert(ps2_ee_slt64(&s, 32, 1, 2) == -1);
-
-    puts("OK: EE operations, decoder dispatch and bounded memory access.");
+    puts("OK: EE helpers, decoder, and decoded memory operations.");
     return 0;
 }
