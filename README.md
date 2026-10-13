@@ -4,29 +4,28 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Estado atual
 
-A base inclui estado do Emotion Engine (EE), helpers aritméticos e lógicos, operações imediatas, comparações, movimentos condicionais, um despachante inicial de instruções e um módulo de acesso a memória RAM de teste.
+A base inclui estado do Emotion Engine (EE), helpers aritméticos e lógicos, comparações, movimentos condicionais, um decodificador inicial e um buffer de RAM de teste.
 
-O módulo `src/ps2/ee_decode.c` decodifica um subconjunto de instruções R-type e imediatas. A interface `ps2_ee_execute_memory_word()` também executa um subconjunto de loads/stores usando `src/ps2/ee_memory.c`: `LB`, `LBU`, `LH`, `LHU`, `LW`, `LWU`, `LD`, `SB`, `SH`, `SW` e `SD`, com endereços calculados por base + imediato com sinal. Os testes cobrem leitura/escrita decodificada, extensão de sinal para `LW` e endereços desalinhados.
+`ps2_ee_execute_word()` trata um subconjunto de operações R-type (incluindo deslocamentos fixos/variáveis), operações imediatas aritméticas/lógicas (`ADDI`, `ADDIU`, `SLTI`, `SLTIU`, `ANDI`, `ORI`, `XORI`, `LUI`) e comparações/movimentos condicionais. `ps2_ee_execute_memory_word()` trata `LB`, `LBU`, `LH`, `LHU`, `LW`, `LWU`, `LD`, `SB`, `SH`, `SW` e `SD`; outras instruções encaminham para o decodificador aritmético.
 
-**Limitações importantes:** o módulo de memória é apenas um buffer genérico de testes, não o mapa real do PS2. A interface de memória é separada do executor geral; loads/stores ainda não são despachados por `ps2_ee_execute_word()`. Ainda não existe loop completo de busca/execução, avanço arquitetural do PC, tratamento completo de exceções/overflow, branches e delay slots completos, MMU/TLB, nem suporte integral às instruções MIPS III/R5900 e extensões do Emotion Engine. O projeto ainda não executa jogos de PS2 e não é um emulador funcional.
+A memória é apenas um buffer genérico little-endian para testes, não o mapa real do PS2. O executor ainda não é um ciclo completo de busca/execução: não atualiza PC, não trata branches/delay slots ou exceções completas e não inclui MMU/TLB. O suporte MIPS III/R5900 e extensões específicas do Emotion Engine é incompleto. Portanto, o projeto ainda não executa jogos de PS2.
 
 ## Validação na nuvem
 
-1. Abra a aba **Actions**.
-2. Execute **PS2Palace360 - Cloud Toolchain** manualmente ou envie uma alteração para `main`.
-3. O trabalho de validação executa `make validate` e `make test-host`.
-4. A etapa Xbox 360 exige um ambiente libXenon provisionado. O runner padrão do GitHub não inclui `xenon-gcc` automaticamente; essa etapa precisa de configuração explícita.
+1. Abra **Actions** e execute **PS2Palace360 - Cloud Toolchain**.
+2. A workflow de host deve executar `make validate` e `make test-host`.
+3. A compilação Xbox 360 exige um runner configurado com libXenon; o runner padrão do GitHub não inclui `xenon-gcc` automaticamente.
 
-## Testes em Linux
+## Testes de host
 
     make validate
     make test-host
 
-Para compilar um XEX real, ainda é necessário configurar e validar o SDK libXenon, o entrypoint específico do Xbox 360 e a invocação compatível do `elf2xex`.
+O alvo `xex` ainda não produz um executável; requer toolchain libXenon validada, entrypoint de Xbox 360 e comando `elf2xex` verificado.
 
 ## BIOS
 
-Nenhuma BIOS de console é distribuída neste repositório. Use somente uma imagem extraída legalmente do seu próprio console, quando o loader de BIOS estiver implementado.
+Nenhuma BIOS é distribuída. Quando houver loader, use apenas uma imagem extraída legalmente do seu próprio console.
 
 ## Licença
 
