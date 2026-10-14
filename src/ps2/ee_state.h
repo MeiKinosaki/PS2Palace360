@@ -16,6 +16,9 @@ typedef struct ps2_ee_state {
     uint32_t epc;
 } ps2_ee_state_t;
 
+/* Initial MIPS-style exception entry; exc_code is the Cause.ExcCode value. */
+void ps2_ee_raise_exception(ps2_ee_state_t *state, uint32_t fault_pc,
+                            uint32_t exc_code, int in_delay_slot);
 void ps2_ee_reset(ps2_ee_state_t *state);
 int ps2_ee_add32(ps2_ee_state_t *state, unsigned rd,
                  unsigned rs, unsigned rt);
