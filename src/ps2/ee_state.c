@@ -16,6 +16,25 @@ void ps2_ee_reset(ps2_ee_state_t *state)
     state->gpr[0] = 0;
 }
 
+void ps2_ee_raise_exception(ps2_ee_state_t *state, uint32_t fault_pc,
+                            uint32_t exc_code, int in_delay_slot)
+{
+    uint32_t vector;
+    if (state == NULL) return;
+    if ((state->status & UINT32_C(0x2)) == 0u) {
+        state->epc = in_delay_slot ? fault_pc - UINT32_C(4) : fault_pc;
+        state->cause &= ~UINT32_C(0x8000007c);
+        state->cause |= (exc_code & UINT32_C(0x1f)) << 2;
+        if (in_delay_slot) state->cause |= UINT32_C(0x80000000);
+    }
+    state->status |= UINT32_C(0x2);
+    vector = (state->status & UINT32_C(0x00400000)) != 0u
+           ? UINT32_C(0xBFC00380) : UINT32_C(0x80000180);
+    state->pc = vector;
+    state->next_pc = vector + UINT32_C(4);
+    state->gpr[0] = 0;
+}
+
 int ps2_ee_add32(ps2_ee_state_t *state, unsigned rd,
                  unsigned rs, unsigned rt)
 {
