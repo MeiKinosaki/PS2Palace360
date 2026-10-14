@@ -93,6 +93,7 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
     case 0x0d: if(rt)s->gpr[rt]=a|(insn&0xffffu); break;
     case 0x0e: if(rt)s->gpr[rt]=a^(insn&0xffffu); break;
     case 0x0f: rc=ps2_ee_lui(s,rt,(uint16_t)insn); goto done;
+    case 0x18: { uint64_t addend=(uint64_t)(int64_t)imm, z=a+addend; if ((((~(a^addend)) & (a^z)) >> 63) != 0u) return PS2_EE_STEP_UNSUPPORTED; if(rt)s->gpr[rt]=z; break; } /* DADDI */
     case 0x19: if(rt)s->gpr[rt]=a+(uint64_t)(int64_t)imm; break; /* DADDIU */
     default: return PS2_EE_STEP_UNSUPPORTED;
     }
