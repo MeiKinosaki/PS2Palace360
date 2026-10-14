@@ -45,6 +45,9 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
         case 0x11: s->hi=a; break;
         case 0x12: if(rd)s->gpr[rd]=s->lo; break;
         case 0x13: s->lo=a; break;
+        case 0x14: if(rd)s->gpr[rd]=b<<((unsigned)a&63u); break; /* DSLLV */
+        case 0x16: if(rd)s->gpr[rd]=b>>((unsigned)a&63u); break; /* DSRLV */
+        case 0x17: if(rd)s->gpr[rd]=(uint64_t)((int64_t)b>>((unsigned)a&63u)); break; /* DSRAV */
         case 0x18: { int64_t product=(int64_t)(int32_t)a*(int64_t)(int32_t)b; uint64_t bits=(uint64_t)product; s->lo=(uint64_t)(int64_t)(int32_t)bits; s->hi=(uint64_t)(int64_t)(int32_t)(bits>>32); break; }
         case 0x19: { uint64_t product=(uint64_t)(uint32_t)a*(uint64_t)(uint32_t)b; s->lo=(uint64_t)(int64_t)(int32_t)product; s->hi=(uint64_t)(int64_t)(int32_t)(product>>32); break; }
         case 0x1a: { int32_t x=(int32_t)a, y=(int32_t)b; if(y!=0) { if(x==INT32_MIN && y==-1) { s->lo=(uint64_t)(int64_t)INT32_MIN; s->hi=0; } else { s->lo=(uint64_t)(int64_t)(x/y); s->hi=(uint64_t)(int64_t)(x%y); } } break; }
