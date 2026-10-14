@@ -29,17 +29,22 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
         case 0x04: v=(uint32_t)b<<((unsigned)a&31u); if(rd)s->gpr[rd]=(uint64_t)(int64_t)(int32_t)v; break;
         case 0x06: v=(uint32_t)b>>((unsigned)a&31u); if(rd)s->gpr[rd]=(uint64_t)(int64_t)(int32_t)v; break;
         case 0x07: v=(uint64_t)(int64_t)((int32_t)b>>((unsigned)a&31u)); if(rd)s->gpr[rd]=v; break;
-        case 0x10: if(rd)s->gpr[rd]=s->hi; break; /* MFHI */
-        case 0x11: s->hi=a; break; /* MTHI */
-        case 0x12: if(rd)s->gpr[rd]=s->lo; break; /* MFLO */
-        case 0x13: s->lo=a; break; /* MTLO */
+        case 0x10: if(rd)s->gpr[rd]=s->hi; break;
+        case 0x11: s->hi=a; break;
+        case 0x12: if(rd)s->gpr[rd]=s->lo; break;
+        case 0x13: s->lo=a; break;
         case 0x18: { int64_t product=(int64_t)(int32_t)a*(int64_t)(int32_t)b; uint64_t bits=(uint64_t)product; s->lo=(uint64_t)(int64_t)(int32_t)bits; s->hi=(uint64_t)(int64_t)(int32_t)(bits>>32); break; }
         case 0x19: { uint64_t product=(uint64_t)(uint32_t)a*(uint64_t)(uint32_t)b; s->lo=(uint64_t)(int64_t)(int32_t)product; s->hi=(uint64_t)(int64_t)(int32_t)(product>>32); break; }
         case 0x1a: { int32_t x=(int32_t)a, y=(int32_t)b; if(y!=0) { if(x==INT32_MIN && y==-1) { s->lo=(uint64_t)(int64_t)INT32_MIN; s->hi=0; } else { s->lo=(uint64_t)(int64_t)(x/y); s->hi=(uint64_t)(int64_t)(x%y); } } break; }
         case 0x1b: { uint32_t x=(uint32_t)a, y=(uint32_t)b; if(y!=0u) { s->lo=(uint64_t)(int64_t)(int32_t)(x/y); s->hi=(uint64_t)(int64_t)(int32_t)(x%y); } break; }
-        case 0x38: if(rd)s->gpr[rd]=b<<shamt; break; /* DSLL */
-        case 0x3a: if(rd)s->gpr[rd]=b>>shamt; break; /* DSRL */
-        case 0x3b: if(rd)s->gpr[rd]=(uint64_t)((int64_t)b>>shamt); break; /* DSRA */
+        case 0x2d: if(rd)s->gpr[rd]=a+b; break; /* DADDU */
+        case 0x2f: if(rd)s->gpr[rd]=a-b; break; /* DSUBU */
+        case 0x38: if(rd)s->gpr[rd]=b<<shamt; break;
+        case 0x3a: if(rd)s->gpr[rd]=b>>shamt; break;
+        case 0x3b: if(rd)s->gpr[rd]=(uint64_t)((int64_t)b>>shamt); break;
+        case 0x3c: if(rd)s->gpr[rd]=b<<(shamt+32u); break; /* DSLL32 */
+        case 0x3e: if(rd)s->gpr[rd]=b>>(shamt+32u); break; /* DSRL32 */
+        case 0x3f: if(rd)s->gpr[rd]=(uint64_t)((int64_t)b>>(shamt+32u)); break; /* DSRA32 */
         case 0x08: s->next_pc=(uint32_t)a; break;
         case 0x09: if(rd)s->gpr[rd]=(uint32_t)(s->pc+4u); s->next_pc=(uint32_t)a; break;
         case 0x20: rc=ps2_ee_add32(s,rd,rs,rt); goto done;
@@ -70,6 +75,7 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
     case 0x0d: if(rt)s->gpr[rt]=a|(insn&0xffffu); break;
     case 0x0e: if(rt)s->gpr[rt]=a^(insn&0xffffu); break;
     case 0x0f: rc=ps2_ee_lui(s,rt,(uint16_t)insn); goto done;
+    case 0x19: if(rt)s->gpr[rt]=a+(uint64_t)(int64_t)imm; break; /* DADDIU */
     default: return PS2_EE_STEP_UNSUPPORTED;
     }
     s->gpr[0]=0; return PS2_EE_STEP_OK;
