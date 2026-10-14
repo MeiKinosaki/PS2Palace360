@@ -4,13 +4,13 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v18** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v19** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
-O protótipo inclui estado básico do EE, decodificação parcial, operações aritméticas/lógicas, acessos à memória e uma função inicial de passo de execução. A expansão atual adiciona `DADDU`, `DSUBU`, `DADDIU`, `DSLL32`, `DSRL32`, `DSRA32` e amplia o tratamento de operações HI/LO com `MFHI`, `MTHI`, `MFLO`, `MTLO`, `MULT`, `MULTU`, `DIV` e `DIVU`.
+O protótipo inclui estado básico do EE, decodificação parcial, operações aritméticas/lógicas, acessos à memória e uma função inicial de passo de execução. A expansão atual adiciona `DADDU`, `DSUBU`, `DADDIU`, `DSLL32`, `DSRL32`, `DSRA32` e amplia o tratamento de operações HI/LO com `MFHI`, `MTHI`, `MFLO`, `MTLO`, `MULT`, `MULTU`, `DIV` e `DIVU`. A rodada v19 acrescenta um primeiro suporte a `DMULT`, `DMULTU`, `DDIV` e `DDIVU`, com produto de 128 bits calculado por partes de 32 bits para evitar depender de tipos inteiros de 128 bits do compilador.
 
-Os testes de host foram ampliados para cobrir operações de 64 bits, deslocamentos de 32+ bits, resultados HI/LO e divisão/multiplicação com operandos de teste. Execute `make validate` e `make test-host` para validar no ambiente de desenvolvimento.
+Os testes de host foram ampliados para cobrir operações de 64 bits, deslocamentos de 32+ bits, resultados HI/LO e multiplicação/divisão de 64 bits com operandos de teste. A semântica completa do R5900 e todos os casos extremos ainda precisam de validação adicional. Execute `make validate` e `make test-host` para validar no ambiente de desenvolvimento.
 
 ## Limitações importantes
 
