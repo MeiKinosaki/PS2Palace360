@@ -41,6 +41,13 @@ int main(void)
     s.gpr[1]=UINT64_C(0x100000000);s.gpr[2]=7;
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(3u<<11)|0x2du)==PS2_EE_STEP_OK&&s.gpr[3]==UINT64_C(0x100000007));
     assert(ps2_ee_execute_word(&s,(2u<<16)|(4u<<11)|(1u<<6)|0x3cu)==PS2_EE_STEP_OK&&s.gpr[4]==UINT64_C(0xe00000000));
+    /* Variable 64-bit shifts */
+    s.gpr[1]=UINT64_C(0x100000001); s.gpr[2]=3;
+    assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(3u<<11)|0x14u)==PS2_EE_STEP_OK && s.gpr[3]==UINT64_C(0x800000008));
+    s.gpr[1]=4; s.gpr[2]=UINT64_C(0x100000000);
+    assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(4u<<11)|0x16u)==PS2_EE_STEP_OK && s.gpr[4]==UINT64_C(0x10000000));
+    s.gpr[1]=1; s.gpr[2]=UINT64_C(0x8000000000000000);
+    assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(5u<<11)|0x17u)==PS2_EE_STEP_OK && s.gpr[5]==UINT64_C(0xc000000000000000));
     /* DADDI immediate arithmetic and signed overflow */
     s.gpr[1]=100; assert(ps2_ee_execute_word(&s,(0x18u<<26)|(1u<<21)|(2u<<16)|23u)==PS2_EE_STEP_OK && s.gpr[2]==123);
     s.gpr[1]=UINT64_C(0x7fffffffffffffff); assert(ps2_ee_execute_word(&s,(0x18u<<26)|(1u<<21)|(2u<<16)|1u)==PS2_EE_STEP_UNSUPPORTED);
