@@ -53,6 +53,13 @@ int main(void)
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(4u<<11)|0x16u)==PS2_EE_STEP_OK && s.gpr[4]==UINT64_C(0x10000000));
     s.gpr[1]=1; s.gpr[2]=UINT64_C(0x8000000000000000);
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(5u<<11)|0x17u)==PS2_EE_STEP_OK && s.gpr[5]==UINT64_C(0xc000000000000000));
+    /* 32-bit ADD, SUB, ADDI overflow should enter exception handler. */
+    ps2_ee_reset(&s); s.pc=0x4004; s.status=0; s.gpr[1]=UINT32_C(0x7fffffff); s.gpr[2]=1;
+    assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(3u<<11)|0x20u)==PS2_EE_STEP_EXCEPTION); assert(s.epc==0x4000u && ((s.cause>>2)&31u)==12u);
+    ps2_ee_reset(&s); s.pc=0x5004; s.status=0; s.gpr[1]=UINT32_C(0x80000000); s.gpr[2]=1;
+    assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(3u<<11)|0x22u)==PS2_EE_STEP_EXCEPTION); assert(s.epc==0x5000u && ((s.cause>>2)&31u)==12u);
+    ps2_ee_reset(&s); s.pc=0x6004; s.status=0; s.gpr[1]=UINT32_C(0x7fffffff);
+    assert(ps2_ee_execute_word(&s,(0x08u<<26)|(1u<<21)|(2u<<16)|1u)==PS2_EE_STEP_EXCEPTION); assert(s.epc==0x6000u && ((s.cause>>2)&31u)==12u);
     /* DADDI immediate arithmetic and signed overflow */
     s.gpr[1]=100; assert(ps2_ee_execute_word(&s,(0x18u<<26)|(1u<<21)|(2u<<16)|23u)==PS2_EE_STEP_OK && s.gpr[2]==123);
     s.status=0; s.pc=0x1004; s.gpr[1]=UINT64_C(0x7fffffffffffffff); assert(ps2_ee_execute_word(&s,(0x18u<<26)|(1u<<21)|(2u<<16)|1u)==PS2_EE_STEP_EXCEPTION); assert(s.epc==0x1000u && ((s.cause>>2)&31u)==12u && (s.status&2u)!=0u);
