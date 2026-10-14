@@ -64,9 +64,9 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
         case 0x1d: mul_u64_128(a,b,&s->hi,&s->lo); break; /* DMULTU */
         case 0x1e: { int64_t x=(int64_t)a,y=(int64_t)b; if(y!=0){ if(x==INT64_MIN&&y==-1){s->lo=(uint64_t)INT64_MIN;s->hi=0;}else{s->lo=(uint64_t)(x/y);s->hi=(uint64_t)(x%y);} } break; } /* DDIV */
         case 0x1f: if(b!=0u){s->lo=a/b;s->hi=a%b;} break; /* DDIVU */
-        case 0x2c: { uint64_t z=a+b; if ((((~(a^b)) & (a^z)) >> 63) != 0u) return PS2_EE_STEP_UNSUPPORTED; if(rd)s->gpr[rd]=z; break; } /* DADD */
+        case 0x2c: { uint64_t z=a+b; if ((((~(a^b)) & (a^z)) >> 63) != 0u) { ps2_ee_raise_exception(s, s->pc - UINT32_C(4), 12u, 0); return PS2_EE_STEP_EXCEPTION; } if(rd)s->gpr[rd]=z; break; } /* DADD */
         case 0x2d: if(rd)s->gpr[rd]=a+b; break; /* DADDU */
-        case 0x2e: { uint64_t z=a-b; if ((((a^b) & (a^z)) >> 63) != 0u) return PS2_EE_STEP_UNSUPPORTED; if(rd)s->gpr[rd]=z; break; } /* DSUB */
+        case 0x2e: { uint64_t z=a-b; if ((((a^b) & (a^z)) >> 63) != 0u) { ps2_ee_raise_exception(s, s->pc - UINT32_C(4), 12u, 0); return PS2_EE_STEP_EXCEPTION; } if(rd)s->gpr[rd]=z; break; } /* DSUB */
         case 0x2f: if(rd)s->gpr[rd]=a-b; break; /* DSUBU */
         case 0x38: if(rd)s->gpr[rd]=b<<shamt; break;
         case 0x3a: if(rd)s->gpr[rd]=b>>shamt; break;
@@ -104,7 +104,7 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
     case 0x0d: if(rt)s->gpr[rt]=a|(insn&0xffffu); break;
     case 0x0e: if(rt)s->gpr[rt]=a^(insn&0xffffu); break;
     case 0x0f: rc=ps2_ee_lui(s,rt,(uint16_t)insn); goto done;
-    case 0x18: { uint64_t addend=(uint64_t)(int64_t)imm, z=a+addend; if ((((~(a^addend)) & (a^z)) >> 63) != 0u) return PS2_EE_STEP_UNSUPPORTED; if(rt)s->gpr[rt]=z; break; } /* DADDI */
+    case 0x18: { uint64_t addend=(uint64_t)(int64_t)imm, z=a+addend; if ((((~(a^addend)) & (a^z)) >> 63) != 0u) { ps2_ee_raise_exception(s, s->pc - UINT32_C(4), 12u, 0); return PS2_EE_STEP_EXCEPTION; } if(rt)s->gpr[rt]=z; break; } /* DADDI */
     case 0x19: if(rt)s->gpr[rt]=a+(uint64_t)(int64_t)imm; break; /* DADDIU */
     default: return PS2_EE_STEP_UNSUPPORTED;
     }
