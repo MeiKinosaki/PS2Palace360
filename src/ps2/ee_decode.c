@@ -17,6 +17,14 @@ static void mul_u64_128(uint64_t a, uint64_t b, uint64_t *hi, uint64_t *lo)
     *hi=p3+(p1>>32)+(p2>>32)+(middle>>32);
 }
 
+static uint64_t arithmetic_shift_right_u64(uint64_t value, unsigned amount)
+{
+    if (amount == 0u) return value;
+    if (amount >= 64u) amount = 63u;
+    if ((value & UINT64_C(0x8000000000000000)) == 0u) return value >> amount;
+    return (value >> amount) | (UINT64_MAX << (64u - amount));
+}
+
 static int load_value(ps2_ee_memory_t *mem, uint32_t address, unsigned width, int sign_extend, uint64_t *out)
 {
     uint64_t v;
@@ -47,7 +55,7 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
         case 0x13: s->lo=a; break;
         case 0x14: if(rd)s->gpr[rd]=b<<((unsigned)a&63u); break; /* DSLLV */
         case 0x16: if(rd)s->gpr[rd]=b>>((unsigned)a&63u); break; /* DSRLV */
-        case 0x17: if(rd)s->gpr[rd]=(uint64_t)((int64_t)b>>((unsigned)a&63u)); break; /* DSRAV */
+        case 0x17: if(rd)s->gpr[rd]=arithmetic_shift_right_u64(b,(unsigned)a&63u); break; /* DSRAV */
         case 0x18: { int64_t product=(int64_t)(int32_t)a*(int64_t)(int32_t)b; uint64_t bits=(uint64_t)product; s->lo=(uint64_t)(int64_t)(int32_t)bits; s->hi=(uint64_t)(int64_t)(int32_t)(bits>>32); break; }
         case 0x19: { uint64_t product=(uint64_t)(uint32_t)a*(uint64_t)(uint32_t)b; s->lo=(uint64_t)(int64_t)(int32_t)product; s->hi=(uint64_t)(int64_t)(int32_t)(product>>32); break; }
         case 0x1a: { int32_t x=(int32_t)a, y=(int32_t)b; if(y!=0) { if(x==INT32_MIN && y==-1) { s->lo=(uint64_t)(int64_t)INT32_MIN; s->hi=0; } else { s->lo=(uint64_t)(int64_t)(x/y); s->hi=(uint64_t)(int64_t)(x%y); } } break; }
@@ -62,10 +70,10 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
         case 0x2f: if(rd)s->gpr[rd]=a-b; break; /* DSUBU */
         case 0x38: if(rd)s->gpr[rd]=b<<shamt; break;
         case 0x3a: if(rd)s->gpr[rd]=b>>shamt; break;
-        case 0x3b: if(rd)s->gpr[rd]=(uint64_t)((int64_t)b>>shamt); break;
+        case 0x3b: if(rd)s->gpr[rd]=arithmetic_shift_right_u64(b,shamt); break;
         case 0x3c: if(rd)s->gpr[rd]=b<<(shamt+32u); break; /* DSLL32 */
         case 0x3e: if(rd)s->gpr[rd]=b>>(shamt+32u); break; /* DSRL32 */
-        case 0x3f: if(rd)s->gpr[rd]=(uint64_t)((int64_t)b>>(shamt+32u)); break; /* DSRA32 */
+        case 0x3f: if(rd)s->gpr[rd]=arithmetic_shift_right_u64(b,shamt+32u); break; /* DSRA32 */
         case 0x08: s->next_pc=(uint32_t)a; break;
         case 0x09: if(rd)s->gpr[rd]=(uint32_t)(s->pc+4u); s->next_pc=(uint32_t)a; break;
         case 0x20: rc=ps2_ee_add32(s,rd,rs,rt); goto done;
