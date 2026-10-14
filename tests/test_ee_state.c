@@ -41,6 +41,16 @@ int main(void)
     s.gpr[1]=UINT64_C(0x100000000);s.gpr[2]=7;
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(3u<<11)|0x2du)==PS2_EE_STEP_OK&&s.gpr[3]==UINT64_C(0x100000007));
     assert(ps2_ee_execute_word(&s,(2u<<16)|(4u<<11)|(1u<<6)|0x3cu)==PS2_EE_STEP_OK&&s.gpr[4]==UINT64_C(0xe00000000));
+    /* 64-bit multiply/divide subset */
+    s.gpr[1]=UINT64_C(0x100000000); s.gpr[2]=3;
+    assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|0x1du)==PS2_EE_STEP_OK);
+    assert(s.lo==UINT64_C(0x300000000) && s.hi==0);
+    s.gpr[1]=100; s.gpr[2]=9;
+    assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|0x1fu)==PS2_EE_STEP_OK);
+    assert(s.lo==11 && s.hi==1);
+    s.gpr[1]=(uint64_t)(int64_t)-100; s.gpr[2]=9;
+    assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|0x1eu)==PS2_EE_STEP_OK);
+    assert((int64_t)s.lo==-11 && (int64_t)s.hi==-1);
     /* MULT: 6 * -3 => signed 32-bit product in HI/LO */
     s.gpr[1]=6;s.gpr[2]=(uint64_t)(int64_t)-3;
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|0x18u)==PS2_EE_STEP_OK);
