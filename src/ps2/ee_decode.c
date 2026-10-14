@@ -5,6 +5,18 @@
 #include <stddef.h>
 #include <limits.h>
 
+static uint64_t abs_u64(int64_t x) { uint64_t u=(uint64_t)x; return x < 0 ? (~u + 1u) : u; }
+
+/* Portable 64x64 -> 128-bit product using 32-bit limbs. */
+static void mul_u64_128(uint64_t a, uint64_t b, uint64_t *hi, uint64_t *lo)
+{
+    uint64_t a0=(uint32_t)a, a1=a>>32, b0=(uint32_t)b, b1=b>>32;
+    uint64_t p0=a0*b0, p1=a0*b1, p2=a1*b0, p3=a1*b1;
+    uint64_t middle=(p0>>32)+(uint32_t)p1+(uint32_t)p2;
+    *lo=(middle<<32)|(uint32_t)p0;
+    *hi=p3+(p1>>32)+(p2>>32)+(middle>>32);
+}
+
 static int load_value(ps2_ee_memory_t *mem, uint32_t address, unsigned width, int sign_extend, uint64_t *out)
 {
     uint64_t v;
@@ -37,6 +49,10 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
         case 0x19: { uint64_t product=(uint64_t)(uint32_t)a*(uint64_t)(uint32_t)b; s->lo=(uint64_t)(int64_t)(int32_t)product; s->hi=(uint64_t)(int64_t)(int32_t)(product>>32); break; }
         case 0x1a: { int32_t x=(int32_t)a, y=(int32_t)b; if(y!=0) { if(x==INT32_MIN && y==-1) { s->lo=(uint64_t)(int64_t)INT32_MIN; s->hi=0; } else { s->lo=(uint64_t)(int64_t)(x/y); s->hi=(uint64_t)(int64_t)(x%y); } } break; }
         case 0x1b: { uint32_t x=(uint32_t)a, y=(uint32_t)b; if(y!=0u) { s->lo=(uint64_t)(int64_t)(int32_t)(x/y); s->hi=(uint64_t)(int64_t)(int32_t)(x%y); } break; }
+        case 0x1c: { uint64_t x=abs_u64((int64_t)a), y=abs_u64((int64_t)b), hi, lo; mul_u64_128(x,y,&hi,&lo); if(((int64_t)a<0)!=((int64_t)b<0)){ lo=~lo+1u; hi=~hi+(lo==0u); } s->hi=hi; s->lo=lo; break; } /* DMULT */
+        case 0x1d: mul_u64_128(a,b,&s->hi,&s->lo); break; /* DMULTU */
+        case 0x1e: { int64_t x=(int64_t)a,y=(int64_t)b; if(y!=0){ if(x==INT64_MIN&&y==-1){s->lo=(uint64_t)INT64_MIN;s->hi=0;}else{s->lo=(uint64_t)(x/y);s->hi=(uint64_t)(x%y);} } break; } /* DDIV */
+        case 0x1f: if(b!=0u){s->lo=a/b;s->hi=a%b;} break; /* DDIVU */
         case 0x2d: if(rd)s->gpr[rd]=a+b; break; /* DADDU */
         case 0x2f: if(rd)s->gpr[rd]=a-b; break; /* DSUBU */
         case 0x38: if(rd)s->gpr[rd]=b<<shamt; break;
