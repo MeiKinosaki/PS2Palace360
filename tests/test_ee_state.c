@@ -110,5 +110,10 @@ int main(void)
     assert(ps2_ee_mem_store(&mem,0,3,0)==-1);
     assert(ps2_ee_mem_load(&mem,0,4,NULL)==-1);
     { ps2_ee_memory_t invalid={NULL,64}; assert(ps2_ee_mem_load(&invalid,0,1,&loaded)==-1); }
+    /* Initial direct-mapped segment translation: KSEG0/KSEG1 only. */
+    { uint32_t physical=0; assert(ps2_ee_translate_address(UINT32_C(0x80001234),&physical)==0 && physical==UINT32_C(0x1234)); }
+    { uint32_t physical=0; assert(ps2_ee_translate_address(UINT32_C(0xA0004321),&physical)==0 && physical==UINT32_C(0x4321)); }
+    { uint32_t physical=0; assert(ps2_ee_translate_address(UINT32_C(0x00001234),&physical)==-1); }
+    { assert(ps2_ee_translate_address(UINT32_C(0x80000000),NULL)==-1); }
     puts("OK: EE helpers, decoder, 64-bit shifts/arithmetic, HI/LO and memory/step tests.");return 0;
 }
