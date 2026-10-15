@@ -6,7 +6,9 @@ static int valid(const ps2_ee_memory_t *m, uint32_t address,
     if (m == 0 || m->ram == 0) return 0;
     if (width != 1u && width != 2u && width != 4u && width != 8u) return 0;
     if ((address & (width - 1u)) != 0u) return 0;
-    if ((uint64_t)address + width > m->ram_size) return 0;
+    /* Subtraction form avoids overflow in address + width. */
+    if ((uint64_t)address > (uint64_t)m->ram_size) return 0;
+    if ((uint64_t)width > (uint64_t)m->ram_size - (uint64_t)address) return 0;
     return 1;
 }
 
