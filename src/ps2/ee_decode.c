@@ -17,6 +17,14 @@ static void mul_u64_128(uint64_t a, uint64_t b, uint64_t *hi, uint64_t *lo)
     *hi=p3+(p1>>32)+(p2>>32)+(middle>>32);
 }
 
+static uint32_t arithmetic_shift_right_u32(uint32_t value, unsigned amount)
+{
+    if (amount == 0u) return value;
+    if (amount >= 32u) amount = 31u;
+    if ((value & UINT32_C(0x80000000)) == 0u) return value >> amount;
+    return (value >> amount) | (UINT32_MAX << (32u - amount));
+}
+
 static uint64_t arithmetic_shift_right_u64(uint64_t value, unsigned amount)
 {
     if (amount == 0u) return value;
@@ -45,10 +53,10 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
         switch(fn) {
         case 0x00: v=(uint32_t)b<<shamt; if(rd)s->gpr[rd]=(uint64_t)(int64_t)(int32_t)v; break;
         case 0x02: v=(uint32_t)b>>shamt; if(rd)s->gpr[rd]=(uint64_t)(int64_t)(int32_t)v; break;
-        case 0x03: v=(uint64_t)(int64_t)((int32_t)b>>shamt); if(rd)s->gpr[rd]=v; break;
+        case 0x03: v=(uint64_t)(int64_t)(int32_t)arithmetic_shift_right_u32((uint32_t)b,shamt); if(rd)s->gpr[rd]=v; break;
         case 0x04: v=(uint32_t)b<<((unsigned)a&31u); if(rd)s->gpr[rd]=(uint64_t)(int64_t)(int32_t)v; break;
         case 0x06: v=(uint32_t)b>>((unsigned)a&31u); if(rd)s->gpr[rd]=(uint64_t)(int64_t)(int32_t)v; break;
-        case 0x07: v=(uint64_t)(int64_t)((int32_t)b>>((unsigned)a&31u)); if(rd)s->gpr[rd]=v; break;
+        case 0x07: v=(uint64_t)(int64_t)(int32_t)arithmetic_shift_right_u32((uint32_t)b,(unsigned)a&31u); if(rd)s->gpr[rd]=v; break;
         case 0x10: if(rd)s->gpr[rd]=s->hi; break;
         case 0x11: s->hi=a; break;
         case 0x12: if(rd)s->gpr[rd]=s->lo; break;
