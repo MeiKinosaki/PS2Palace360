@@ -5,6 +5,15 @@
 
 #define PS2_EE_GPR_COUNT 32u
 
+/* MIPS-style Cause.ExcCode values used by the experimental EE core. */
+#define PS2_EE_EXC_INT   0u
+#define PS2_EE_EXC_ADEL  4u
+#define PS2_EE_EXC_ADES  5u
+#define PS2_EE_EXC_SYS   8u
+#define PS2_EE_EXC_BP    9u
+#define PS2_EE_EXC_RI    10u
+#define PS2_EE_EXC_OV    12u
+
 typedef struct ps2_ee_state {
     uint64_t gpr[PS2_EE_GPR_COUNT];
     uint64_t hi;
