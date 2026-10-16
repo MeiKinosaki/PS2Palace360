@@ -115,5 +115,20 @@ int main(void)
     { uint32_t physical=0; assert(ps2_ee_translate_address(UINT32_C(0xA0004321),&physical)==0 && physical==UINT32_C(0x4321)); }
     { uint32_t physical=0; assert(ps2_ee_translate_address(UINT32_C(0x00001234),&physical)==-1); }
     { assert(ps2_ee_translate_address(UINT32_C(0x80000000),NULL)==-1); }
+    /* v0.85b: exception entry delay-slot metadata and EXL preservation. */
+    ps2_ee_reset(&s);
+    s.pc = UINT32_C(0x80001004);
+    s.cause = UINT32_C(0x00000100);
+    ps2_ee_raise_exception(&s, s.pc, PS2_EE_EXC_OV, 1);
+    assert(s.epc == UINT32_C(0x80001000));
+    assert(((s.cause >> 2) & 31u) == PS2_EE_EXC_OV);
+    assert((s.cause & UINT32_C(0x80000000)) != 0u);
+    assert((s.status & UINT32_C(0x2)) != 0u);
+    assert(s.pc == UINT32_C(0x80000180) && s.next_pc == UINT32_C(0x80000184));
+    /* A nested exception while EXL is set must preserve the first EPC/Cause. */
+    { uint32_t saved_epc=s.epc, saved_cause=s.cause;
+      ps2_ee_raise_exception(&s, UINT32_C(0x1234), PS2_EE_EXC_RI, 0);
+      assert(s.epc == saved_epc && s.cause == saved_cause); }
+    ps2_ee_raise_exception(NULL, 0, PS2_EE_EXC_INT, 0);
     puts("OK: EE helpers, decoder, 64-bit shifts/arithmetic, HI/LO and memory/step tests.");return 0;
 }
