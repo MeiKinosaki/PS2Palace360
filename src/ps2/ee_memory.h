@@ -17,4 +17,12 @@ int ps2_ee_mem_load(ps2_ee_memory_t *mem, uint32_t address,
                     unsigned width, uint64_t *value);
 int ps2_ee_mem_store(ps2_ee_memory_t *mem, uint32_t address,
                      unsigned width, uint64_t value);
+
+/* Experimental virtual accessors: translate KSEG0/KSEG1 then access RAM.
+ * This is not a complete PS2 memory map and does not implement a TLB.
+ */
+int ps2_ee_mem_load_virtual(ps2_ee_memory_t *mem, uint32_t virtual_address,
+                            unsigned width, uint64_t *value);
+int ps2_ee_mem_store_virtual(ps2_ee_memory_t *mem, uint32_t virtual_address,
+                             unsigned width, uint64_t value);
 #endif
