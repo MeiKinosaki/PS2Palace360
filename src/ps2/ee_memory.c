@@ -46,3 +46,21 @@ int ps2_ee_mem_store(ps2_ee_memory_t *m, uint32_t address,
         m->ram[address + i] = (uint8_t)(value >> (8u * i));
     return 0;
 }
+
+int ps2_ee_mem_load_virtual(ps2_ee_memory_t *m, uint32_t virtual_address,
+                            unsigned width, uint64_t *value)
+{
+    uint32_t physical_address;
+    if (ps2_ee_translate_address(virtual_address, &physical_address) != 0)
+        return -1;
+    return ps2_ee_mem_load(m, physical_address, width, value);
+}
+
+int ps2_ee_mem_store_virtual(ps2_ee_memory_t *m, uint32_t virtual_address,
+                             unsigned width, uint64_t value)
+{
+    uint32_t physical_address;
+    if (ps2_ee_translate_address(virtual_address, &physical_address) != 0)
+        return -1;
+    return ps2_ee_mem_store(m, physical_address, width, value);
+}
