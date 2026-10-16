@@ -7,12 +7,20 @@
 
 /* MIPS-style Cause.ExcCode values used by the experimental EE core. */
 #define PS2_EE_EXC_INT   0u
+#define PS2_EE_EXC_MOD   1u
+#define PS2_EE_EXC_TLBL  2u
+#define PS2_EE_EXC_TLBS  3u
 #define PS2_EE_EXC_ADEL  4u
 #define PS2_EE_EXC_ADES  5u
+#define PS2_EE_EXC_IBE   6u
+#define PS2_EE_EXC_DBE   7u
 #define PS2_EE_EXC_SYS   8u
 #define PS2_EE_EXC_BP    9u
 #define PS2_EE_EXC_RI    10u
+#define PS2_EE_EXC_CPU   11u
 #define PS2_EE_EXC_OV    12u
+#define PS2_EE_EXC_TR    13u
+#define PS2_EE_EXC_FPE   15u
 
 typedef struct ps2_ee_state {
     uint64_t gpr[PS2_EE_GPR_COUNT];
