@@ -115,6 +115,15 @@ int main(void)
     { uint32_t physical=0; assert(ps2_ee_translate_address(UINT32_C(0xA0004321),&physical)==0 && physical==UINT32_C(0x4321)); }
     { uint32_t physical=0; assert(ps2_ee_translate_address(UINT32_C(0x00001234),&physical)==-1); }
     { assert(ps2_ee_translate_address(UINT32_C(0x80000000),NULL)==-1); }
+    /* v0.86b: verify the named architectural exception-code constants. */
+    assert(PS2_EE_EXC_INT == 0u && PS2_EE_EXC_MOD == 1u);
+    assert(PS2_EE_EXC_TLBL == 2u && PS2_EE_EXC_TLBS == 3u);
+    assert(PS2_EE_EXC_ADEL == 4u && PS2_EE_EXC_ADES == 5u);
+    assert(PS2_EE_EXC_IBE == 6u && PS2_EE_EXC_DBE == 7u);
+    assert(PS2_EE_EXC_SYS == 8u && PS2_EE_EXC_BP == 9u);
+    assert(PS2_EE_EXC_RI == 10u && PS2_EE_EXC_CPU == 11u);
+    assert(PS2_EE_EXC_OV == 12u && PS2_EE_EXC_TR == 13u);
+    assert(PS2_EE_EXC_FPE == 15u);
     /* v0.85b: exception entry delay-slot metadata and EXL preservation. */
     ps2_ee_reset(&s);
     s.pc = UINT32_C(0x80001004);
