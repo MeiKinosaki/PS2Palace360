@@ -124,6 +124,13 @@ int main(void)
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
                                    &loaded) == -1);
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
+    /* v0.88b: virtual accessor width, alignment and boundary checks. */
+    assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000020), 1, UINT64_C(0x5a)) == 0);
+    assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0xA0000020), 1, &loaded) == 0 && loaded == UINT64_C(0x5a));
+    assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000028), 8, UINT64_C(0x0123456789abcdef)) == 0);
+    assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0xA0000028), 8, &loaded) == 0 && loaded == UINT64_C(0x0123456789abcdef));
+    assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x80000021), 2, &loaded) == -1);
+    assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x8000003c), 8, 1) == -1);
     /* v0.86b: verify the named architectural exception-code constants. */
     assert(PS2_EE_EXC_INT == 0u && PS2_EE_EXC_MOD == 1u);
     assert(PS2_EE_EXC_TLBL == 2u && PS2_EE_EXC_TLBS == 3u);
