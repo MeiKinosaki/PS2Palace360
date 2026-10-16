@@ -115,6 +115,15 @@ int main(void)
     { uint32_t physical=0; assert(ps2_ee_translate_address(UINT32_C(0xA0004321),&physical)==0 && physical==UINT32_C(0x4321)); }
     { uint32_t physical=0; assert(ps2_ee_translate_address(UINT32_C(0x00001234),&physical)==-1); }
     { assert(ps2_ee_translate_address(UINT32_C(0x80000000),NULL)==-1); }
+    /* v0.87b: translated KSEG0/KSEG1 accesses reach the test RAM. */
+    assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000010), 4,
+                                    UINT32_C(0xdeadbeef)) == 0);
+    assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0xA0000010), 4,
+                                   &loaded) == 0);
+    assert(loaded == UINT32_C(0xdeadbeef));
+    assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
+                                   &loaded) == -1);
+    assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
     /* v0.86b: verify the named architectural exception-code constants. */
     assert(PS2_EE_EXC_INT == 0u && PS2_EE_EXC_MOD == 1u);
     assert(PS2_EE_EXC_TLBL == 2u && PS2_EE_EXC_TLBS == 3u);
