@@ -223,7 +223,7 @@ int main(void)
         assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00401020), 0, &physical) == PS2_EE_TLB_ERR_MULTIPLE);
         assert(physical == UINT32_C(0xdeadbeef));
         assert(ps2_ee_tlb_invalidate_all(&tlb) == PS2_EE_TLB_OK);
-        assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00401020), 0, &physical) == PS2_EE_TLB_ERR_MISS);
+        assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00401020), 0, &physical) == PS2_EE_TLB_ERR_INVALID);
       }
     }
     /* v0.101b: experimental 4 KiB TLB translation. */
