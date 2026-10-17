@@ -189,3 +189,20 @@ ps2_ee_step_result_t ps2_ee_execute_memory_word_tlb(ps2_ee_state_t *s,
     }
     return PS2_EE_STEP_OK;
 }
+
+/* V2.0.20b: TLB-aware fetch/execute loop. This remains a prototype: faults
+ * return INVALID instead of entering architecturally correct CP0 exceptions. */
+ps2_ee_step_result_t ps2_ee_step_tlb(ps2_ee_state_t *s, ps2_ee_memory_t *mem,
+                                    const ps2_ee_tlb_t *tlb)
+{
+    uint64_t raw;
+    ps2_ee_step_result_t result;
+    if (s == NULL || mem == NULL || tlb == NULL) return PS2_EE_STEP_INVALID;
+    if (ps2_ee_mem_load_virtual_tlb(mem, tlb, s->pc, 4, &raw) != PS2_EE_MEM_OK)
+        return PS2_EE_STEP_INVALID;
+    s->pc = s->next_pc;
+    s->next_pc += 4u;
+    result = ps2_ee_execute_memory_word_tlb(s, mem, tlb, (uint32_t)raw);
+    s->gpr[0] = 0;
+    return result;
+}
