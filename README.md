@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.103b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.104b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -86,3 +86,10 @@ Foram preservados os marcos de documentação v0.92b–v0.100b; o avanço com c�
 - Adicionada função experimental que escolhe tradução direta para KSEG0/KSEG1 e consulta a tabela TLB de protótipo para outros endereços.
 - Testes escritos para tradução direta, miss sem alterar o endereço de saída, acerto via TLB e ponteiro inválido.
 - Não está ligada automaticamente aos acessos `ps2_ee_mem_load_virtual_ex`/`store`; também não implementa CP0 nem exceções de TLB. Execução dos testes não confirmada.
+
+
+## v0.104b — Acessos de memória ligados à TLB experimental
+
+- Adicionadas funções separadas para leitura/escrita virtual que passam pelo despachante de tradução direta/TLB antes de validar e acessar o buffer RAM de teste.
+- Adicionados testes para acesso traduzido, miss, argumentos inválidos e leitura/escrita básica.
+- Limitações: os acessos antigos não foram redirecionados automaticamente para esta API; a RAM continua sendo um buffer de teste, não o mapa físico completo do PS2. O código de TLB é um protótipo de páginas de 4 KiB, não a MMU R5900 completa. Testes escritos não confirmam execução.
