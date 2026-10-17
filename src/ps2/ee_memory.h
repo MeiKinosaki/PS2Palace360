@@ -16,7 +16,8 @@ enum {
     PS2_EE_TLB_ERR_ARGUMENT = -1,
     PS2_EE_TLB_ERR_MISS = -2,
     PS2_EE_TLB_ERR_INVALID = -3,
-    PS2_EE_TLB_ERR_MODIFIED = -4
+    PS2_EE_TLB_ERR_MODIFIED = -4,
+    PS2_EE_TLB_ERR_MULTIPLE = -5
 };
 
 typedef struct ps2_ee_tlb_entry {
