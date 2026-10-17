@@ -4,7 +4,11 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.20b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.21b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+
+### V2.0.21b — regressões adicionais de memória e TLB
+
+Adicionados testes ao conjunto de host para rejeição de acessos desalinhados, larguras inválidas e operações fora do limite da RAM de teste; tradução TLB sem correspondência preservando o endereço físico de saída; mapeamento somente-leitura recusando escrita com status Modified; e visibilidade de entradas globais entre ASIDs. O código de testes foi enviado ao repositório, mas ainda não há resultado de execução confirmado para esta revisão. Os testes cobrem o protótipo atual, não certificam compatibilidade completa com o hardware PS2.
 
 ## Núcleo Emotion Engine (EE)
 
