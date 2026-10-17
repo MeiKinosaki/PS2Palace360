@@ -13,9 +13,11 @@ O protótipo inclui estado básico do EE, decodificação parcial, operações a
 
 Este projeto ainda é um protótipo, não um emulador funcional de PS2. A semântica completa do MIPS III/R5900 não está implementada; faltam instruções e extensões específicas, exceções arquiteturais completas, MMU/TLB e tratamento preciso de delay slots. O buffer de RAM é apenas para testes e não representa o mapa real de memória do PS2. IOP, DMA, VU, GS, áudio, controles, mídia e boot de jogos não estão integrados.
 
-## Toolchain na nuvem
+## Toolchain na nuvem e artefato final
 
-Abra **Actions** e execute **PS2Palace360 - Cloud Toolchain**. A validação de host usa `make validate` e `make test-host`. A compilação para Xbox 360 exige runner configurado com libXenon; o runner padrão do GitHub não inclui `xenon-gcc` automaticamente. `default.xex` não foi confirmado como gerado.
+**Prioridade de saída: `default.xex`.** O fluxo de entrega deve gerar e validar diretamente o executável XEX como artefato principal; `Xenon.elf` não é mais tratado como produto final solicitado. Se o processo de compilação precisar de um ELF intermediário internamente, ele será apenas uma etapa técnica temporária e não o artefato principal publicado.
+
+Abra **Actions** e execute **PS2Palace360 - Cloud Toolchain**. A validação de host usa `make validate` e `make test-host`. A compilação XEX exige runner configurado com libXenon e ferramenta de conversão apropriada; o runner padrão do GitHub não inclui `xenon-gcc` automaticamente. **`default.xex` ainda não foi confirmado como gerado nem testado nesta versão.**
 
 ## BIOS
 
@@ -153,3 +155,11 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 - O endereço físico de saída não é alterado no caso de múltiplas correspondências.
 - Testes adicionados para colisão e para ausência de tradução após invalidação integral.
 - Limite: isto é uma proteção diagnóstica do protótipo, não uma implementação completa do comportamento de shutdown/exceções do R5900. A compilação e execução dos testes não foram confirmadas nesta rodada.
+
+
+## V2.0.4b — Prioridade de entrega `default.xex`
+
+- A meta de build foi reorganizada: `default.xex` é o artefato principal a produzir e validar.
+- `Xenon.elf`, se necessário internamente pela toolchain, fica como etapa intermediária e não como saída final solicitada.
+- Esta atualização altera a prioridade/documentação do fluxo; não afirma que o XEX já foi compilado, carregado ou validado em Xbox 360.
+- Próxima etapa técnica: inspecionar workflow e Makefile, configurar a geração/conversão para XEX e publicar o artefato apenas após um build bem-sucedido.
