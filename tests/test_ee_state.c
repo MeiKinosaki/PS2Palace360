@@ -351,5 +351,20 @@ int main(void)
       assert(ps2_ee_execute_memory_word_tlb(&s, &mem, &tlb,
           (0x23u<<26)|(1u<<21)|(2u<<16)) == PS2_EE_STEP_INVALID);
     }
-\n    puts("OK: EE helpers, decoder, TLB-backed scalar memory ops, arithmetic and memory tests.");return 0;
+\n
+    /* V2.0.20b: execute one instruction fetched through the TLB-backed path. */
+    { ps2_ee_tlb_t tlb;
+      ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00001000), 0, 0, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x00002000), 0, 0, 1, 1, 0) == PS2_EE_TLB_OK);
+      /* Place LW r2,0(r1) at physical 0; data at physical 4. */
+      assert(ps2_ee_mem_store(&mem, 0, 4, (UINT32_C(0x23)<<26)|(1u<<21)|(2u<<16)) == 0);
+      assert(ps2_ee_mem_store(&mem, 4, 4, UINT32_C(0x76543210)) == 0);
+      ps2_ee_reset(&s); s.pc=UINT32_C(0x00001000); s.next_pc=UINT32_C(0x00001004);
+      s.gpr[1]=UINT32_C(0x00002004);
+      assert(ps2_ee_step_tlb(&s,&mem,&tlb)==PS2_EE_STEP_OK);
+      assert(s.gpr[2]==UINT32_C(0x76543210));
+      assert(s.pc==UINT32_C(0x00001004));
+    }
+    puts("OK: EE helpers, decoder, TLB-backed step, scalar memory ops and arithmetic tests.");return 0;
 }
