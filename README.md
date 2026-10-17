@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.3b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.4b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -17,7 +17,7 @@ Este projeto ainda é um protótipo, não um emulador funcional de PS2. A semân
 
 **Prioridade de saída: `default.xex`.** O fluxo de entrega deve gerar e validar diretamente o executável XEX como artefato principal; `Xenon.elf` não é mais tratado como produto final solicitado. Se o processo de compilação precisar de um ELF intermediário internamente, ele será apenas uma etapa técnica temporária e não o artefato principal publicado.
 
-Abra **Actions** e execute **PS2Palace360 - Cloud Toolchain**. A validação de host usa `make validate` e `make test-host`. A compilação XEX exige runner configurado com libXenon e ferramenta de conversão apropriada; o runner padrão do GitHub não inclui `xenon-gcc` automaticamente. **`default.xex` ainda não foi confirmado como gerado nem testado nesta versão.**
+Abra **Actions** e execute **PS2Palace360 - Cloud Toolchain**. A validação de host usa `make validate` e `make test-host`. A compilação XEX exige runner configurado com `xenon-gcc` e `elf2xex`; o runner padrão do GitHub não inclui essas ferramentas automaticamente. O alvo `make xex` gera `build/default.xex`; o ELF de entrada fica apenas como intermediário interno. O workflow publica somente `default.xex` e seu checksum, após compilação bem-sucedida. O `src/main.c` ainda é um bootstrap vazio e não inicializa o runtime de vídeo/controles nem executa jogos PS2: mesmo que o XEX seja gerado, ele não representa um emulador funcional.
 
 ## BIOS
 
@@ -163,3 +163,11 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 - `Xenon.elf`, se necessário internamente pela toolchain, fica como etapa intermediária e não como saída final solicitada.
 - Esta atualização altera a prioridade/documentação do fluxo; não afirma que o XEX já foi compilado, carregado ou validado em Xbox 360.
 - Próxima etapa técnica: inspecionar workflow e Makefile, configurar a geração/conversão para XEX e publicar o artefato apenas após um build bem-sucedido.
+
+
+## V2.0.4b — geração de default.xex como artefato principal
+
+- O Makefile agora define `make xex` como alvo real: compila `src/main.c` e os módulos EE com `xenon-gcc`, usa `elf2xex` e exige que `build/default.xex` exista e não esteja vazio.
+- O ELF intermediário é chamado `build/ps2palace360.elf` e não é publicado como artefato final.
+- O workflow verifica as ferramentas necessárias e publica somente `build/default.xex` e seu checksum.
+- Limite importante: `src/main.c` continua sendo um bootstrap vazio; gerar um XEX não significa que o emulador tenha runtime Xbox funcional ou consiga executar jogos PS2. Build ainda depende de runner com libXenon e elf2xex; a execução não foi confirmada nesta atualização.
