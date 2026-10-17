@@ -7,4 +7,4 @@ typedef enum { PS2_EE_STEP_OK = 0, PS2_EE_STEP_UNSUPPORTED = 1, PS2_EE_STEP_INVA
 ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *state, uint32_t instruction);
 ps2_ee_step_result_t ps2_ee_execute_memory_word(ps2_ee_state_t *state, ps2_ee_memory_t *memory, uint32_t instruction);
 ps2_ee_step_result_t ps2_ee_step(ps2_ee_state_t *state, ps2_ee_memory_t *memory);
-ps2_ee_step_result_t ps2_ee_execute_memory_word_tlb(ps2_ee_state_t *state, ps2_ee_memory_t *memory, const ps2_ee_tlb_t *tlb, uint32_t instruction);\n#endif
+ps2_ee_step_result_t ps2_ee_execute_memory_word_tlb(ps2_ee_state_t *state, ps2_ee_memory_t *memory, const ps2_ee_tlb_t *tlb, uint32_t instruction);\nps2_ee_step_result_t ps2_ee_step_tlb(ps2_ee_state_t *state, ps2_ee_memory_t *memory, const ps2_ee_tlb_t *tlb);\n#endif
