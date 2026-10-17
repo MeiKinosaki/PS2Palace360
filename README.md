@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.100b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.101b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -60,3 +60,15 @@ Ordem de implementação: MMU/TLB → mapa físico EE → exceções de acesso �
 ### v0.100b — Summarize ten-round development batch
 
 Fechamento do lote: dez marcos sequenciais de planejamento/documentação foram registrados; isso não equivale a dez implementações completas nem a dez versões testadas. O núcleo continua experimental.
+
+
+## v0.101b — TLB experimental de 4 KiB
+
+- Adicionado scaffold de TLB indexada com 16 entradas de teste, páginas de 4 KiB, ASID, bit global, validade e permissão de escrita (dirty).
+- Adicionadas rotinas de reset, escrita de entrada e tradução, com códigos separados para argumento inválido, miss, entrada inválida e tentativa de escrita sem dirty.
+- Testes de regressão foram adicionados para hit, offset, ASID, miss, invalid, modified e argumentos inválidos.
+- **Limitações:** isto ainda não é a MMU real do R5900/Emotion Engine. Não há PageMask variável, CP0, substituição Random/Wired, integração automática com acessos virtuais, exceções arquiteturais de TLB ou validação de compatibilidade com jogos. Os testes foram escritos, mas a execução e a compilação não foram confirmadas nesta rodada.
+
+### Lote solicitado de dez avanços
+
+Foram preservados os marcos de documentação v0.92b–v0.100b; o avanço com código nesta rodada é v0.101b. Os marcos documentais não devem ser interpretados como dez versões de código completas.
