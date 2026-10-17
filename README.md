@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.11b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.12b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -218,3 +218,9 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 
 - A etapa de validação host agora registra se `xenon-gcc` e `elf2xex` estão presentes no runner, sem falhar o conjunto de testes host só por faltar a toolchain Xenon.
 - O job Xbox continua exigindo ambas as ferramentas e falhará explicitamente se não estiverem instaladas; esta alteração não instala libXenon nem comprova build XEX.
+
+
+## V2.0.12b — aviso de bootstrap incompleto
+
+- `make validate` agora emite aviso explícito quando detecta que `src/main.c` ainda está marcado como placeholder, sem converter essa limitação em falso sucesso de runtime.
+- A checagem continua estrutural; a implementação do entrypoint Xbox, vídeo, controles e loop principal segue pendente.
