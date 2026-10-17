@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.8b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.9b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -199,3 +199,10 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 - `make validate` agora percorre os módulos listados em `EE_SOURCES` e falha se algum arquivo estiver ausente ou vazio.
 - A validação confirma também que `src/main.c` contém uma declaração de `main()`; isso é apenas um contrato estrutural, não comprova inicialização de libXenon ou funcionamento do runtime.
 - A execução de `make validate`, dos testes host e do workflow ainda deve ser confirmada por logs reais.
+
+
+## V2.0.9b — validação do arquivo de testes
+
+- `make validate` também falha se `tests/test_ee_state.c` existir, mas estiver vazio.
+- A validação estrutural agora verifica a presença e o conteúdo dos módulos EE e da fonte de testes, além da declaração `main()`.
+- Isto evita falsos positivos de arquivos vazios; não comprova a qualidade dos testes, nem substitui `make test-host` ou o build real de XEX.
