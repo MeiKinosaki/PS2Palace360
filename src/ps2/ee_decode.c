@@ -141,3 +141,51 @@ ps2_ee_step_result_t ps2_ee_step(ps2_ee_state_t *s, ps2_ee_memory_t *mem)
     s->pc=s->next_pc;s->next_pc+=4u;
     result=ps2_ee_execute_memory_word(s,mem,(uint32_t)raw);s->gpr[0]=0;return result;
 }
+
+/* V2.0.19b: execute scalar load/store instructions through the experimental
+ * direct-map/TLB memory path. Translation faults are surfaced as INVALID for
+ * now; architectural CP0/TLB exception delivery remains future work. */
+ps2_ee_step_result_t ps2_ee_execute_memory_word_tlb(ps2_ee_state_t *s,
+                                                     ps2_ee_memory_t *mem,
+                                                     const ps2_ee_tlb_t *tlb,
+                                                     uint32_t insn)
+{
+    unsigned op, rs, rt, width = 0;
+    uint32_t address;
+    uint64_t value;
+    int store = 0, sign_extend = 0, status;
+    if (s == NULL || mem == NULL || tlb == NULL) return PS2_EE_STEP_INVALID;
+    op = insn >> 26;
+    rs = (insn >> 21) & 31u;
+    rt = (insn >> 16) & 31u;
+    switch (op) {
+    case 0x20: width = 1; sign_extend = 1; break; /* LB */
+    case 0x24: width = 1; break;                 /* LBU */
+    case 0x21: width = 2; sign_extend = 1; break; /* LH */
+    case 0x25: width = 2; break;                 /* LHU */
+    case 0x23: width = 4; sign_extend = 1; break; /* LW */
+    case 0x27: width = 4; break;                 /* LWU */
+    case 0x37: width = 8; break;                 /* LD */
+    case 0x28: width = 1; store = 1; break;       /* SB */
+    case 0x29: width = 2; store = 1; break;       /* SH */
+    case 0x2b: width = 4; store = 1; break;       /* SW */
+    case 0x3f: width = 8; store = 1; break;       /* SD */
+    default: return ps2_ee_execute_word(s, insn);
+    }
+    address = (uint32_t)s->gpr[rs] + (uint32_t)(int32_t)(int16_t)insn;
+    if (store) {
+        status = ps2_ee_mem_store_virtual_tlb(mem, tlb, address, width, s->gpr[rt]);
+        if (status != PS2_EE_MEM_OK) return PS2_EE_STEP_INVALID;
+    } else {
+        status = ps2_ee_mem_load_virtual_tlb(mem, tlb, address, width, &value);
+        if (status != PS2_EE_MEM_OK) return PS2_EE_STEP_INVALID;
+        if (sign_extend && width < 8u) {
+            unsigned bits = width * 8u;
+            uint64_t sign = UINT64_C(1) << (bits - 1u);
+            if ((value & sign) != 0u) value |= UINT64_MAX << bits;
+        }
+        if (rt != 0u) s->gpr[rt] = value;
+        s->gpr[0] = 0;
+    }
+    return PS2_EE_STEP_OK;
+}
