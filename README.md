@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.19b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.20b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -268,3 +268,9 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 - Adicionado teste de integração unitária que mapeia páginas virtuais de código e dados para RAM, executa um `LW` e verifica o registrador de destino e avanço do PC.
 - Limitações mantidas explícitas: não há ainda entrada arquitetural em CP0 para miss/invalid/modified, delay slots completos, MMIO ou mapa físico real do PS2.
 - A alteração foi registrada no repositório; não foi possível confirmar execução de CI/build neste turno.
+
+## Validação automatizada e limites atuais
+
+O workflow `Host validation` executa `make check` em runner Linux para compilar e rodar os testes do núcleo em host. Isso não equivale a uma compilação Xenon nem comprova execução no Xbox 360; o resultado só deve ser considerado aprovado depois que o workflow terminar com sucesso.
+
+O caminho experimental `ps2_ee_step_tlb` busca a instrução via TLB e encaminha a execução para o decodificador de memória. Ainda não implementa exceções CP0 completas, delay slots arquiteturalmente corretos, nem fidelidade integral do R5900. Falhas de tradução continuam retornando `PS2_EE_STEP_INVALID`.
