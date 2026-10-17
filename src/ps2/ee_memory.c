@@ -200,3 +200,31 @@ int ps2_ee_translate_address_with_tlb(const ps2_ee_tlb_t *tlb,
     }
     return ps2_ee_tlb_translate(tlb, virtual_address, is_write, physical_address);
 }
+
+
+/* v0.104b: memory access routed through direct-map/TLB dispatcher. */
+int ps2_ee_mem_load_virtual_tlb(ps2_ee_memory_t *m, const ps2_ee_tlb_t *tlb,
+                                uint32_t virtual_address, unsigned width,
+                                uint64_t *value)
+{
+    uint32_t physical_address;
+    int status;
+    if (m == 0 || m->ram == 0 || value == 0) return PS2_EE_MEM_ERR_ARGUMENT;
+    status = ps2_ee_translate_address_with_tlb(tlb, virtual_address, 0, &physical_address);
+    if (status != PS2_EE_TLB_OK) return PS2_EE_MEM_ERR_TRANSLATION;
+    return ps2_ee_mem_load(m, physical_address, width, value) == 0
+           ? PS2_EE_MEM_OK : PS2_EE_MEM_ERR_ACCESS;
+}
+
+int ps2_ee_mem_store_virtual_tlb(ps2_ee_memory_t *m, const ps2_ee_tlb_t *tlb,
+                                 uint32_t virtual_address, unsigned width,
+                                 uint64_t value)
+{
+    uint32_t physical_address;
+    int status;
+    if (m == 0 || m->ram == 0) return PS2_EE_MEM_ERR_ARGUMENT;
+    status = ps2_ee_translate_address_with_tlb(tlb, virtual_address, 1, &physical_address);
+    if (status != PS2_EE_TLB_OK) return PS2_EE_MEM_ERR_TRANSLATION;
+    return ps2_ee_mem_store(m, physical_address, width, value) == 0
+           ? PS2_EE_MEM_OK : PS2_EE_MEM_ERR_ACCESS;
+}
