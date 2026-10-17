@@ -51,6 +51,7 @@ int ps2_ee_tlb_lookup(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
                       ps2_ee_tlb_entry_t *entry);
 int ps2_ee_tlb_check_page(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
                           int is_write);
+unsigned ps2_ee_tlb_count_valid(const ps2_ee_tlb_t *tlb);
 int ps2_ee_tlb_translate(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
                          int is_write, uint32_t *physical_address);
 int ps2_ee_translate_address_with_tlb(const ps2_ee_tlb_t *tlb,
