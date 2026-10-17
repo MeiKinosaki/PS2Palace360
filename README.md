@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.110b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.0b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -123,3 +123,10 @@ Foram preservados os marcos de documentação v0.92b–v0.100b; o avanço com c�
 ## Limites desta rodada
 
 As etapas v0.101b–v0.110b não equivalem a uma MMU completa nem a dez versões de emulador prontas. O protótipo TLB usa uma tabela pequena com páginas fixas de 4 KiB; a arquitetura real do Emotion Engine tem uma TLB maior e detalhes de CP0, caches e exceções que ainda precisam ser modelados. Referência técnica: https://israpps.github.io/ps2tek/PS2/EE/ e https://github.com/mamedev/mame/blob/master/src/devices/cpu/mips/mips3.cpp
+
+
+## Migração de versão — V2.0.0b
+
+A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V2.0.1b, V2.0.2b, V2.0.3b…**, avançando uma versão por vez sem saltos. A série anterior (v0.101b–v0.110b) permanece no histórico como histórico técnico; não é apagada nem renumerada retroativamente.
+
+**Versão oficial atual: V2.0.0b.** A mudança de número é uma decisão de versionamento, não uma alegação de que a emulação de PS2 está pronta ou que os testes/builds foram aprovados.
