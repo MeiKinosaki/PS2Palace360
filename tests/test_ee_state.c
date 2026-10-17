@@ -124,6 +124,17 @@ int main(void)
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
                                    &loaded) == -1);
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
+    /* v0.104b: TLB-aware memory accessors. */
+    { ps2_ee_tlb_t tlb; uint64_t value=0;
+      ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00401000), UINT32_C(0x00000020), 0, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_mem_store_virtual_tlb(&mem, &tlb, UINT32_C(0x00401008), 4, UINT32_C(0xcafebabe)) == PS2_EE_MEM_OK);
+      assert(ps2_ee_mem_load_virtual_tlb(&mem, &tlb, UINT32_C(0x00401008), 4, &value) == PS2_EE_MEM_OK && value == UINT32_C(0xcafebabe));
+      assert(ps2_ee_mem_load_virtual_tlb(&mem, &tlb, UINT32_C(0x00402008), 4, &value) == PS2_EE_MEM_ERR_TRANSLATION);
+      assert(ps2_ee_mem_store_virtual_tlb(&mem, &tlb, UINT32_C(0x00401008), 4, 1) == PS2_EE_MEM_OK);
+      assert(ps2_ee_mem_load_virtual_tlb(&mem, &tlb, UINT32_C(0x00401008), 4, NULL) == PS2_EE_MEM_ERR_ARGUMENT);
+      assert(ps2_ee_mem_store_virtual_tlb(&mem, NULL, UINT32_C(0x00401008), 4, 1) == PS2_EE_MEM_ERR_TRANSLATION);
+    }
     /* v0.103b: unified address translation. */
     { ps2_ee_tlb_t tlb; uint32_t physical=UINT32_C(0xfeedface);
       ps2_ee_tlb_reset(&tlb);
