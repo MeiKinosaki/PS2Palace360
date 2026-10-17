@@ -52,6 +52,12 @@ int ps2_ee_tlb_translate(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
 int ps2_ee_translate_address_with_tlb(const ps2_ee_tlb_t *tlb,
                                       uint32_t virtual_address, int is_write,
                                       uint32_t *physical_address);
+int ps2_ee_mem_load_virtual_tlb(ps2_ee_memory_t *mem, const ps2_ee_tlb_t *tlb,
+                                uint32_t virtual_address, unsigned width,
+                                uint64_t *value);
+int ps2_ee_mem_store_virtual_tlb(ps2_ee_memory_t *mem, const ps2_ee_tlb_t *tlb,
+                                 uint32_t virtual_address, unsigned width,
+                                 uint64_t value);
 
 enum {
     PS2_EE_MEM_OK = 0,
