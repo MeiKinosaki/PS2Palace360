@@ -274,3 +274,7 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 O workflow `Host validation` executa `make check` em runner Linux para compilar e rodar os testes do núcleo em host. Isso não equivale a uma compilação Xenon nem comprova execução no Xbox 360; o resultado só deve ser considerado aprovado depois que o workflow terminar com sucesso.
 
 O caminho experimental `ps2_ee_step_tlb` busca a instrução via TLB e encaminha a execução para o decodificador de memória. Ainda não implementa exceções CP0 completas, delay slots arquiteturalmente corretos, nem fidelidade integral do R5900. Falhas de tradução continuam retornando `PS2_EE_STEP_INVALID`.
+
+## Backlog de engenharia
+
+O plano granular de 20.000 etapas está em [`docs/ROADMAP_20000_ETAPAS.md`](docs/ROADMAP_20000_ETAPAS.md). Os itens começam pendentes; a lista não representa 20.000 implementações concluídas. O cabeçalho do decodificador e o arquivo de testes tiveram escapes de nova linha literais corrigidos. A validação automatizada ainda precisa de uma execução aprovada para confirmar compilação e testes.
