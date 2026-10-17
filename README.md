@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.2b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.3b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -144,3 +144,12 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 - Adicionada `ps2_ee_tlb_count_matches`, que conta entradas válidas da página virtual consultada compatíveis com o ASID ativo ou marcadas como globais.
 - Testes adicionados para tabela vazia, ASID incompatível, duas entradas coincidentes, entrada global, entrada inválida e ponteiro nulo.
 - A função é somente diagnóstica: não altera entradas, não escolhe uma tradução e não implementa o comportamento arquitetural de múltiplos hits/shutdown do R5900. **Testes e compilação ainda não foram executados/verificados nesta rodada.**
+
+
+## V2.0.3b — detecção de múltiplas traduções TLB
+
+- Adicionado o estado `PS2_EE_TLB_ERR_MULTIPLE`.
+- `ps2_ee_tlb_translate` passa a contar correspondências válidas compatíveis com ASID/global e retorna erro explícito quando mais de uma entrada válida corresponde à página, em vez de escolher silenciosamente a primeira.
+- O endereço físico de saída não é alterado no caso de múltiplas correspondências.
+- Testes adicionados para colisão e para ausência de tradução após invalidação integral.
+- Limite: isto é uma proteção diagnóstica do protótipo, não uma implementação completa do comportamento de shutdown/exceções do R5900. A compilação e execução dos testes não foram confirmadas nesta rodada.
