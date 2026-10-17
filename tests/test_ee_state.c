@@ -395,5 +395,18 @@ int main(void)
       assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x12345000), &entry) == PS2_EE_TLB_OK);
       assert(entry.global == 1u && entry.physical_page == UINT32_C(0x1000));
     }
+    /* V2.0.22b: instruction-fetch TLB miss enters TLBL exception vector. */
+    {
+      ps2_ee_tlb_t tlb;
+      ps2_ee_tlb_reset(&tlb);
+      ps2_ee_reset(&s);
+      s.pc = UINT32_C(0x00003000);
+      s.next_pc = UINT32_C(0x00003004);
+      assert(ps2_ee_step_tlb(&s, &mem, &tlb) == PS2_EE_STEP_EXCEPTION);
+      assert(s.badvaddr == UINT32_C(0x00003000));
+      assert(s.epc == UINT32_C(0x00003000));
+      assert(((s.cause >> 2) & 31u) == PS2_EE_EXC_TLBL);
+      assert(s.pc == UINT32_C(0x80000180));
+    }
     puts("OK: EE helpers, decoder, TLB-backed step, scalar memory ops and arithmetic tests.");return 0;
 }
