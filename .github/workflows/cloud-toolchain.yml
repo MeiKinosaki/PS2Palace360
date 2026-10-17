@@ -34,6 +34,15 @@ jobs:
         run: make validate
       - name: Run native tests
         run: make test-host
+      - name: Report toolchain prerequisites
+        if: always()
+        shell: bash
+        run: |
+          if command -v xenon-gcc >/dev/null 2>&1 && command -v elf2xex >/dev/null 2>&1; then
+            echo "Xenon toolchain prerequisites: present"
+          else
+            echo "Xenon toolchain prerequisites: missing on this runner; XEX build requires a provisioned libXenon environment"
+          fi
       - name: Package source snapshot
         shell: bash
         run: |
