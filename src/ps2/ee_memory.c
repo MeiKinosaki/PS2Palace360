@@ -138,17 +138,23 @@ int ps2_ee_tlb_lookup(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
                       ps2_ee_tlb_entry_t *entry)
 {
     uint32_t page;
-    unsigned i;
+    const ps2_ee_tlb_entry_t *match = 0;
+    unsigned i, matches = 0;
     if (tlb == 0 || entry == 0) return PS2_EE_TLB_ERR_ARGUMENT;
     page = virtual_address & ~(uint32_t)(PS2_EE_TLB_PAGE_SIZE - 1u);
     for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i) {
         const ps2_ee_tlb_entry_t *e = &tlb->entries[i];
-        if (e->virtual_page == page && (e->global || e->asid == tlb->current_asid)) {
-            *entry = *e;
-            return PS2_EE_TLB_OK;
-        }
+        if (!e->valid || e->virtual_page != page ||
+            (!e->global && e->asid != tlb->current_asid))
+            continue;
+        match = e;
+        ++matches;
     }
-    return PS2_EE_TLB_ERR_MISS;
+    /* Ignore invalid entries and never silently choose among duplicate hits. */
+    if (matches > 1u) return PS2_EE_TLB_ERR_MULTIPLE;
+    if (matches == 0u) return PS2_EE_TLB_ERR_MISS;
+    *entry = *match;
+    return PS2_EE_TLB_OK;
 }
 
 int ps2_ee_tlb_translate(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
