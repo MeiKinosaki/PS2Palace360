@@ -38,7 +38,7 @@ test-host: $(HOST_TEST)
 
 check: validate test-host
 
-$(BUILD_DIR)/ps2palace360.elf: src/main.c $(EE_SOURCES) | $(BUILD_DIR)
+$(BUILD_DIR)/ps2palace360.elf: src/main.c $(EE_SOURCES) | $(BUILD_DIR) toolchain-check
 	$(XENON_CC) $(XENON_CFLAGS) -Isrc/ps2 src/main.c $(EE_SOURCES) -o $@
 
 toolchain-check:
@@ -46,7 +46,7 @@ toolchain-check:
 	@command -v $(ELF2XEX) >/dev/null 2>&1 || { echo "ERRO: $(ELF2XEX) não encontrado; configure a ferramenta de conversão XEX."; exit 2; }
 	@echo "OK: ferramentas da toolchain Xenon encontradas."
 
-$(BUILD_DIR)/default.xex: $(BUILD_DIR)/ps2palace360.elf | toolchain-check
+$(BUILD_DIR)/default.xex: $(BUILD_DIR)/ps2palace360.elf
 	$(ELF2XEX) $< $@
 	@test -s $@ || { echo "ERRO: default.xex não foi gerado."; exit 2; }
 
