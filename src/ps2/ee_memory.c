@@ -269,3 +269,14 @@ unsigned ps2_ee_tlb_count_valid(const ps2_ee_tlb_t *tlb)
         if (tlb->entries[i].valid) ++count;
     return count;
 }
+
+
+/* V2.0.1b: invalidate every entry, including global mappings. */
+int ps2_ee_tlb_invalidate_all(ps2_ee_tlb_t *tlb)
+{
+    unsigned i;
+    if (tlb == 0) return PS2_EE_TLB_ERR_ARGUMENT;
+    for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i)
+        tlb->entries[i].valid = 0;
+    return PS2_EE_TLB_OK;
+}
