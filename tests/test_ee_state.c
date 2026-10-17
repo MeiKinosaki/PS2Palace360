@@ -124,6 +124,23 @@ int main(void)
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
                                    &loaded) == -1);
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
+    /* v0.89b: translation segment edges and failure-output stability. */
+    { uint32_t physical=UINT32_C(0xfeedface);
+      assert(ps2_ee_translate_address(UINT32_C(0x9fffffff), &physical) == 0);
+      assert(physical == UINT32_C(0x1fffffff)); }
+    { uint32_t physical=UINT32_C(0xfeedface);
+      assert(ps2_ee_translate_address(UINT32_C(0xbfffffff), &physical) == 0);
+      assert(physical == UINT32_C(0x1fffffff)); }
+    { uint32_t physical=UINT32_C(0xfeedface);
+      assert(ps2_ee_translate_address(UINT32_C(0xc0000000), &physical) == -1);
+      assert(physical == UINT32_C(0xfeedface)); }
+    { uint32_t physical=UINT32_C(0xfeedface);
+      assert(ps2_ee_translate_address(UINT32_C(0x00001000), &physical) == -1);
+      assert(physical == UINT32_C(0xfeedface)); }
+    { ps2_ee_memory_t invalid={NULL,64};
+      assert(ps2_ee_mem_load_virtual(&invalid, UINT32_C(0x80000000), 4, &loaded) == -1);
+      assert(ps2_ee_mem_store_virtual(&invalid, UINT32_C(0xA0000000), 4, 0) == -1); }
+    assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x80000000), 4, NULL) == -1);
     /* v0.88b: virtual accessor width, alignment and boundary checks. */
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000020), 1, UINT64_C(0x5a)) == 0);
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0xA0000020), 1, &loaded) == 0 && loaded == UINT64_C(0x5a));
