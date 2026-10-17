@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.5b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.6b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -178,3 +178,10 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 - Adicionado o alvo `make toolchain-check`, que verifica `xenon-gcc` e `elf2xex` antes da etapa de geração do `default.xex`.
 - O workflow chama a pré-verificação antes do build e mantém a publicação condicionada ao sucesso de todas as etapas.
 - Isto melhora o diagnóstico de dependências, mas não instala automaticamente a toolchain no runner do GitHub. O bootstrap em `src/main.c` continua vazio; build, testes e execução em console permanecem não verificados.
+
+
+## V2.0.6b — ordem segura de pré-verificação
+
+- A verificação `toolchain-check` agora é uma dependência de ordem do alvo ELF intermediário, de modo que a compilação só começa depois de confirmar `xenon-gcc` e `elf2xex`, inclusive em builds paralelos do Make.
+- O alvo XEX não repete a dependência de verificação: ela ocorre antes da compilação, evitando que uma execução paralela inicie o compilador antes da checagem.
+- Ainda não há evidência de build/CI bem-sucedido nesta rodada; a toolchain não é instalada pelo workflow e `src/main.c` segue como placeholder sem runtime de Xbox 360.
