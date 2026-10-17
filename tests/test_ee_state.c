@@ -124,6 +124,17 @@ int main(void)
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
                                    &loaded) == -1);
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
+    /* v0.107b: TLB page permission status helper. */
+    { ps2_ee_tlb_t tlb; ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_tlb_check_page(&tlb, UINT32_C(0x1000), 0) == PS2_EE_TLB_ERR_MISS);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x1000), UINT32_C(0x3000), 0, 0, 0, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_check_page(&tlb, UINT32_C(0x1004), 0) == PS2_EE_TLB_ERR_INVALID);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x1000), UINT32_C(0x3000), 0, 1, 0, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_check_page(&tlb, UINT32_C(0x1004), 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_check_page(&tlb, UINT32_C(0x1004), 1) == PS2_EE_TLB_ERR_MODIFIED);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x1000), UINT32_C(0x3000), 0, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_check_page(&tlb, UINT32_C(0x1004), 1) == PS2_EE_TLB_OK);
+    }
     /* v0.105b: TLB lookup by virtual page. */
     { ps2_ee_tlb_t tlb; ps2_ee_tlb_entry_t entry;
       ps2_ee_tlb_reset(&tlb); tlb.current_asid=2;
