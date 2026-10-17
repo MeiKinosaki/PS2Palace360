@@ -154,22 +154,38 @@ int ps2_ee_tlb_lookup(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
 int ps2_ee_tlb_translate(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
                          int is_write, uint32_t *physical_address)
 {
-    uint32_t page, offset;
-    unsigned i;
+    uint32_t page, offset, resolved = 0;
+    const ps2_ee_tlb_entry_t *match = 0;
+    unsigned i, matches = 0;
     if (tlb == 0 || physical_address == 0)
         return PS2_EE_TLB_ERR_ARGUMENT;
     page = virtual_address & ~(uint32_t)(PS2_EE_TLB_PAGE_SIZE - 1u);
     offset = virtual_address & (PS2_EE_TLB_PAGE_SIZE - 1u);
     for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i) {
         const ps2_ee_tlb_entry_t *e = &tlb->entries[i];
-        if (e->virtual_page != page || (!e->global && e->asid != tlb->current_asid))
+        if (!e->valid || e->virtual_page != page ||
+            (!e->global && e->asid != tlb->current_asid))
             continue;
-        if (!e->valid) return PS2_EE_TLB_ERR_INVALID;
-        if (is_write && !e->dirty) return PS2_EE_TLB_ERR_MODIFIED;
-        *physical_address = e->physical_page | offset;
-        return PS2_EE_TLB_OK;
+        match = e;
+        ++matches;
     }
-    return PS2_EE_TLB_ERR_MISS;
+    /* Do not silently pick the first mapping when valid entries collide. */
+    if (matches > 1u) return PS2_EE_TLB_ERR_MULTIPLE;
+    if (matches == 0u) {
+        /* Preserve the prototype's invalid-entry signal if a matching but
+         * invalid entry exists and no valid mapping supersedes it. */
+        for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i) {
+            const ps2_ee_tlb_entry_t *e = &tlb->entries[i];
+            if (e->virtual_page == page &&
+                (e->global || e->asid == tlb->current_asid))
+                return PS2_EE_TLB_ERR_INVALID;
+        }
+        return PS2_EE_TLB_ERR_MISS;
+    }
+    if (is_write && !match->dirty) return PS2_EE_TLB_ERR_MODIFIED;
+    resolved = match->physical_page | offset;
+    *physical_address = resolved;
+    return PS2_EE_TLB_OK;
 }
 
 
