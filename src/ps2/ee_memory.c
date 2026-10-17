@@ -96,3 +96,61 @@ int ps2_ee_mem_store_virtual(ps2_ee_memory_t *m, uint32_t virtual_address,
     return ps2_ee_mem_store_virtual_ex(m, virtual_address, width, value) ==
            PS2_EE_MEM_OK ? 0 : -1;
 }
+
+/* v0.101b: small, explicit TLB scaffold for 4 KiB pages. This is not yet
+ * a complete R5900 MMU: page masks, CP0 registers, privilege checks and
+ * architectural exception entry are handled by later work. */
+void ps2_ee_tlb_reset(ps2_ee_tlb_t *tlb)
+{
+    unsigned i;
+    if (tlb == 0) return;
+    tlb->current_asid = 0;
+    for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i) {
+        tlb->entries[i].virtual_page = 0;
+        tlb->entries[i].physical_page = 0;
+        tlb->entries[i].asid = 0;
+        tlb->entries[i].valid = 0;
+        tlb->entries[i].dirty = 0;
+        tlb->entries[i].global = 0;
+    }
+}
+
+int ps2_ee_tlb_write(ps2_ee_tlb_t *tlb, unsigned index,
+                     uint32_t virtual_page, uint32_t physical_page,
+                     uint8_t asid, int valid_entry, int dirty, int global)
+{
+    ps2_ee_tlb_entry_t *e;
+    if (tlb == 0 || index >= PS2_EE_TLB_ENTRY_COUNT ||
+        (virtual_page & (PS2_EE_TLB_PAGE_SIZE - 1u)) != 0u ||
+        (physical_page & (PS2_EE_TLB_PAGE_SIZE - 1u)) != 0u)
+        return PS2_EE_TLB_ERR_ARGUMENT;
+    e = &tlb->entries[index];
+    e->virtual_page = virtual_page;
+    e->physical_page = physical_page;
+    e->asid = asid;
+    e->valid = valid_entry != 0;
+    e->dirty = dirty != 0;
+    e->global = global != 0;
+    return PS2_EE_TLB_OK;
+}
+
+int ps2_ee_tlb_translate(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
+                         int is_write, uint32_t *physical_address)
+{
+    uint32_t page, offset;
+    unsigned i;
+    if (tlb == 0 || physical_address == 0)
+        return PS2_EE_TLB_ERR_ARGUMENT;
+    page = virtual_address & ~(uint32_t)(PS2_EE_TLB_PAGE_SIZE - 1u);
+    offset = virtual_address & (PS2_EE_TLB_PAGE_SIZE - 1u);
+    for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i) {
+        const ps2_ee_tlb_entry_t *e = &tlb->entries[i];
+        if (e->virtual_page != page || (!e->global && e->asid != tlb->current_asid))
+            continue;
+        if (!e->valid) return PS2_EE_TLB_ERR_INVALID;
+        if (is_write && !e->dirty) return PS2_EE_TLB_ERR_MODIFIED;
+        *physical_address = e->physical_page | offset;
+        return PS2_EE_TLB_OK;
+    }
+    return PS2_EE_TLB_ERR_MISS;
+}
