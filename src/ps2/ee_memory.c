@@ -154,3 +154,32 @@ int ps2_ee_tlb_translate(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
     }
     return PS2_EE_TLB_ERR_MISS;
 }
+
+
+/* v0.102b: small management helpers for the experimental TLB table. */
+int ps2_ee_tlb_set_asid(ps2_ee_tlb_t *tlb, uint8_t asid)
+{
+    if (tlb == 0) return PS2_EE_TLB_ERR_ARGUMENT;
+    tlb->current_asid = asid;
+    return PS2_EE_TLB_OK;
+}
+
+int ps2_ee_tlb_read(const ps2_ee_tlb_t *tlb, unsigned index,
+                    ps2_ee_tlb_entry_t *entry)
+{
+    if (tlb == 0 || entry == 0 || index >= PS2_EE_TLB_ENTRY_COUNT)
+        return PS2_EE_TLB_ERR_ARGUMENT;
+    *entry = tlb->entries[index];
+    return PS2_EE_TLB_OK;
+}
+
+int ps2_ee_tlb_invalidate_asid(ps2_ee_tlb_t *tlb, uint8_t asid)
+{
+    unsigned i;
+    if (tlb == 0) return PS2_EE_TLB_ERR_ARGUMENT;
+    for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i) {
+        ps2_ee_tlb_entry_t *e = &tlb->entries[i];
+        if (!e->global && e->asid == asid) e->valid = 0;
+    }
+    return PS2_EE_TLB_OK;
+}
