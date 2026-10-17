@@ -167,7 +167,13 @@ int main(void)
       assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x00401008), &entry) == PS2_EE_TLB_OK && entry.physical_page == UINT32_C(0x00003000));
       /* Two valid mappings for the same ASID/page are diagnosed explicitly. */
       assert(ps2_ee_tlb_write(&tlb, 3, UINT32_C(0x00401000), UINT32_C(0x00005000), 2, 1, 1, 0) == PS2_EE_TLB_OK);
+      entry.physical_page = UINT32_C(0xfeedface);
       assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x00401008), &entry) == PS2_EE_TLB_ERR_MULTIPLE);
+      assert(entry.physical_page == UINT32_C(0xfeedface));
+      assert(ps2_ee_tlb_invalidate_all(&tlb) == PS2_EE_TLB_OK);
+      entry.physical_page = UINT32_C(0xdeadbeef);
+      assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x00401008), &entry) == PS2_EE_TLB_ERR_MISS);
+      assert(entry.physical_page == UINT32_C(0xdeadbeef));
       assert(ps2_ee_tlb_lookup(&tlb, 0, NULL) == PS2_EE_TLB_ERR_ARGUMENT);
     }
     /* v0.104b: TLB-aware memory accessors. */
