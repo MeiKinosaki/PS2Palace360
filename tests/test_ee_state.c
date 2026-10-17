@@ -366,5 +366,34 @@ int main(void)
       assert(s.gpr[2]==UINT32_C(0x76543210));
       assert(s.pc==UINT32_C(0x00001004));
     }
+    /* V2.0.21b: regression coverage for memory boundaries and TLB permissions. */
+    {
+      ps2_ee_tlb_t tlb;
+      ps2_ee_tlb_entry_t entry;
+      uint32_t physical = UINT32_C(0xdeadbeef);
+      uint64_t value = UINT64_C(0xfeedface);
+      /* Misaligned and out-of-range accesses must fail without corrupting output. */
+      assert(ps2_ee_mem_load(&mem, 1, 4, &value) != 0);
+      assert(ps2_ee_mem_load(&mem, 64, 1, &value) != 0);
+      assert(ps2_ee_mem_load(&mem, 0, 3, &value) != 0);
+      assert(ps2_ee_mem_store(&mem, 63, 2, UINT16_C(0xabcd)) != 0);
+      /* A failed translation must leave the caller's physical address untouched. */
+      ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x12345067), 0, &physical) == PS2_EE_TLB_ERR_MISS);
+      assert(physical == UINT32_C(0xdeadbeef));
+      /* Read-only mapping allows loads but rejects stores as Modified. */
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x12345000),
+          UINT32_C(0x00000000), 0, 1, 0, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x12345067), 0, &physical) == PS2_EE_TLB_OK);
+      assert(physical == UINT32_C(0x67));
+      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x12345067), 1, &physical) == PS2_EE_TLB_ERR_MODIFIED);
+      /* ASID mismatch is a miss; global mappings remain visible across ASIDs. */
+      assert(ps2_ee_tlb_set_asid(&tlb, 7) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x12345000), &entry) == PS2_EE_TLB_ERR_MISS);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x12345000),
+          UINT32_C(0x00001000), 0, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x12345000), &entry) == PS2_EE_TLB_OK);
+      assert(entry.global == 1u && entry.physical_page == UINT32_C(0x1000));
+    }
     puts("OK: EE helpers, decoder, TLB-backed step, scalar memory ops and arithmetic tests.");return 0;
 }
