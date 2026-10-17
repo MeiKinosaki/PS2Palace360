@@ -31,7 +31,10 @@ validate:
 	@test -f src/ps2/ee_memory.h
 	@test -f src/ps2/ee_memory.c
 	@test -f tests/test_ee_state.c
-	@echo "OK: estrutura minima do PS2Palace360 presente."
+	@for f in $(EE_SOURCES); do test -s "$f" || { echo "ERRO: módulo EE ausente ou vazio: $f"; exit 2; }; done
+	@test -s src/main.c || { echo "ERRO: src/main.c ausente ou vazio."; exit 2; }
+	@grep -Eq 'int[[:space:]]+main[[:space:]]*\(' src/main.c || { echo "ERRO: src/main.c não declara main()."; exit 2; }
+	@echo "OK: arquivos mínimos e entrypoint main() presentes (sem validar runtime Xbox)."
 
 test-host: $(HOST_TEST)
 	./$(HOST_TEST)
