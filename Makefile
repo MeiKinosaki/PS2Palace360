@@ -7,7 +7,7 @@ XENON_CFLAGS ?= -O2 -Wall -Wextra
 EE_SOURCES := src/ps2/ee_state.c src/ps2/ee_ops.c src/ps2/ee_immediate.c src/ps2/ee_compare.c src/ps2/ee_decode.c src/ps2/ee_memory.c
 HOST_TEST := $(BUILD_DIR)/test_ee_state
 
-.PHONY: all validate test-host check xex clean
+.PHONY: all validate test-host check toolchain-check xex clean
 
 all: check
 
@@ -39,11 +39,14 @@ test-host: $(HOST_TEST)
 check: validate test-host
 
 $(BUILD_DIR)/ps2palace360.elf: src/main.c $(EE_SOURCES) | $(BUILD_DIR)
-	@command -v $(XENON_CC) >/dev/null 2>&1 || { echo "ERRO: $(XENON_CC) não encontrado; configure libXenon no runner."; exit 2; }
 	$(XENON_CC) $(XENON_CFLAGS) -Isrc/ps2 src/main.c $(EE_SOURCES) -o $@
 
-$(BUILD_DIR)/default.xex: $(BUILD_DIR)/ps2palace360.elf
+toolchain-check:
+	@command -v $(XENON_CC) >/dev/null 2>&1 || { echo "ERRO: $(XENON_CC) não encontrado; configure libXenon no runner."; exit 2; }
 	@command -v $(ELF2XEX) >/dev/null 2>&1 || { echo "ERRO: $(ELF2XEX) não encontrado; configure a ferramenta de conversão XEX."; exit 2; }
+	@echo "OK: ferramentas da toolchain Xenon encontradas."
+
+$(BUILD_DIR)/default.xex: $(BUILD_DIR)/ps2palace360.elf | toolchain-check
 	$(ELF2XEX) $< $@
 	@test -s $@ || { echo "ERRO: default.xex não foi gerado."; exit 2; }
 
