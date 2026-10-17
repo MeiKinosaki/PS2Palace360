@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.93b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.94b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -32,3 +32,7 @@ Escopo: definir com precisão os intervalos aceitos pela tradução direta exper
 ### v0.93b — Add tests for direct-mapped range helper
 
 Escopo: ampliar regressões para limites de segmentos e assegurar que falhas não alterem saídas. A execução permanece pendente até haver resultado de teste verificável.
+
+### v0.94b — Document virtual access status contracts
+
+Contrato: funções `*_virtual_ex` retornam códigos diferenciados; os wrappers antigos mantêm o contrato 0/-1. Erros de tradução ainda não são exceções arquiteturais automaticamente.
