@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.94b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.95b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -36,3 +36,7 @@ Escopo: ampliar regressões para limites de segmentos e assegurar que falhas nã
 ### v0.94b — Document virtual access status contracts
 
 Contrato: funções `*_virtual_ex` retornam códigos diferenciados; os wrappers antigos mantêm o contrato 0/-1. Erros de tradução ainda não são exceções arquiteturais automaticamente.
+
+### v0.95b — Add memory API limitations and invariants
+
+Invariantes documentadas: larguras permitidas 1/2/4/8 bytes, alinhamento natural e validação de limites antes de ler/escrever; endereços KUSEG/KSEG2 continuam indisponíveis sem TLB.
