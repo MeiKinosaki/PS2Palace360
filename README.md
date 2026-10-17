@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.98b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.99b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -52,3 +52,7 @@ Checklist de host: executar `make validate`, `make test-host` e registrar saída
 ### v0.98b — Clarify Xenon build prerequisites
 
 Build Xenon: confirmar existência do toolchain libXenon, flags e linker script antes de declarar artefatos. Nenhum `Xenon.elf` ou `default.xex` foi validado nesta rodada.
+
+### v0.99b — Add staged EE memory roadmap
+
+Ordem de implementação: MMU/TLB → mapa físico EE → exceções de acesso → instruções load/store → IOP/DMA → VU → GS → áudio/entrada → boot e compatibilidade de jogos.
