@@ -54,8 +54,11 @@ toolchain-check:
 
 $(BUILD_DIR)/default.xex: $(BUILD_DIR)/ps2palace360.elf
 	@test -s $< || { echo "ERRO: ELF intermediário ausente ou vazio."; exit 2; }
-	$(ELF2XEX) $< $@
-	@test -s $@ || { echo "ERRO: default.xex não foi gerado."; exit 2; }
+	@rm -f $@.tmp
+	$(ELF2XEX) $< $@.tmp
+	@test -s $@.tmp || { echo "ERRO: conversor não produziu XEX temporário válido."; rm -f $@.tmp; exit 2; }
+	@mv $@.tmp $@
+	@test -s $@ || { echo "ERRO: default.xex não foi finalizado."; rm -f $@; exit 2; }
 
 xex: $(BUILD_DIR)/default.xex
 	@echo "OK: artefato principal gerado em $(BUILD_DIR)/default.xex"
