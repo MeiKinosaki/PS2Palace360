@@ -44,6 +44,7 @@ int ps2_ee_tlb_set_asid(ps2_ee_tlb_t *tlb, uint8_t asid);
 int ps2_ee_tlb_read(const ps2_ee_tlb_t *tlb, unsigned index,
                     ps2_ee_tlb_entry_t *entry);
 int ps2_ee_tlb_invalidate_asid(ps2_ee_tlb_t *tlb, uint8_t asid);
+int ps2_ee_tlb_invalidate_all(ps2_ee_tlb_t *tlb);
 int ps2_ee_tlb_write(ps2_ee_tlb_t *tlb, unsigned index,
                      uint32_t virtual_page, uint32_t physical_page,
                      uint8_t asid, int valid, int dirty, int global);
