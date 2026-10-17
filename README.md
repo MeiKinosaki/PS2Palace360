@@ -282,3 +282,7 @@ O plano granular de 20.000 etapas está em [`docs/ROADMAP_20000_ETAPAS.md`](docs
 ## Plano de 10.000.000 de etapas
 
 O plano de dez milhões de tarefas é documentado em [`docs/PLANO_10000000_ETAPAS.md`](docs/PLANO_10000000_ETAPAS.md), com gerador paginado em [`tools/generate_10000000_step_backlog.py`](tools/generate_10000000_step_backlog.py). Para evitar um arquivo impraticável, o gerador emite até 100.000 itens por execução. Todos começam pendentes; a quantidade de tarefas planejadas não representa progresso funcional nem substitui build/testes.
+
+## Plano operacional de 5.000 etapas
+
+O recorte operacional de 5.000 etapas e seus critérios de aceite estão em [`docs/PLANO_5000_ETAPAS.md`](docs/PLANO_5000_ETAPAS.md). Gere o CSV com o script paginado; todas as tarefas começam pendentes. O plano prioriza primeiro build/testes e correções de TLB/exceções antes de subsistemas maiores.
