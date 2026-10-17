@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.90b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.92b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -24,3 +24,7 @@ Nenhuma BIOS é distribuída. Quando houver loader, use apenas uma imagem extra�
 ## Licença
 
 Consulte [LICENSE](LICENSE).
+
+### v0.92b — Add address-range helper for direct-mapped segments
+
+Escopo: definir com precisão os intervalos aceitos pela tradução direta experimental, sem tratar o buffer de teste como RAM física real.
