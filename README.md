@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.101b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.102b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -72,3 +72,10 @@ Fechamento do lote: dez marcos sequenciais de planejamento/documentação foram 
 ### Lote solicitado de dez avanços
 
 Foram preservados os marcos de documentação v0.92b–v0.100b; o avanço com código nesta rodada é v0.101b. Os marcos documentais não devem ser interpretados como dez versões de código completas.
+
+
+## v0.102b — Gestão experimental da tabela TLB
+
+- Adicionadas rotinas para selecionar ASID atual, consultar uma entrada por índice e invalidar entradas não globais de um ASID.
+- Acrescentados testes de regressão para consulta, invalidação seletiva (entradas globais preservadas) e argumentos inválidos.
+- Estes helpers operam sobre a tabela experimental em memória; ainda não reproduzem os comandos CP0 nem toda a semântica TLB do R5900. Testes escritos não significam execução confirmada.
