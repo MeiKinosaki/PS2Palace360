@@ -260,3 +260,11 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 - A extensão de sinal de LB/LH/LW é aplicada na carga; LBU/LHU/LWU preservam o valor sem sinal.
 - Acrescentados casos de teste para LW com extensão de sinal, LWU, SW, endereço sem mapeamento e múltiplas correspondências TLB.
 - **Limitações:** a API é explícita e não substitui ainda o caminho antigo de execução; falhas de tradução/acesso retornam `PS2_EE_STEP_INVALID` e ainda não geram exceções CP0 arquiteturalmente corretas. Não foram declarados testes executados nem build Xenon concluído nesta rodada. O runtime continua placeholder e `default.xex` funcional permanece não validado.
+
+
+## V2.0.20b — Ciclo EE com busca de instrução via TLB experimental
+
+- Nova API `ps2_ee_step_tlb`: busca a instrução pela memória virtual/TLB experimental e a encaminha ao dispatcher de loads/stores com TLB.
+- Adicionado teste de integração unitária que mapeia páginas virtuais de código e dados para RAM, executa um `LW` e verifica o registrador de destino e avanço do PC.
+- Limitações mantidas explícitas: não há ainda entrada arquitetural em CP0 para miss/invalid/modified, delay slots completos, MMIO ou mapa físico real do PS2.
+- A alteração foi registrada no repositório; não foi possível confirmar execução de CI/build neste turno.
