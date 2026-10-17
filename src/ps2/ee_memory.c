@@ -258,3 +258,14 @@ int ps2_ee_tlb_check_page(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
     if (is_write && !entry.dirty) return PS2_EE_TLB_ERR_MODIFIED;
     return PS2_EE_TLB_OK;
 }
+
+
+/* v0.109b: diagnostic helper for the experimental table. */
+unsigned ps2_ee_tlb_count_valid(const ps2_ee_tlb_t *tlb)
+{
+    unsigned i, count = 0;
+    if (tlb == 0) return 0;
+    for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i)
+        if (tlb->entries[i].valid) ++count;
+    return count;
+}
