@@ -62,13 +62,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if ! command -v xenon-gcc >/dev/null 2>&1; then
-            echo "::warning::Hosted runner does not include xenon-gcc by default."
-            echo "A reproducible, verified libXenon SDK setup is required before producing default.xex."
-            exit 1
-          fi
-          if ! command -v elf2xex >/dev/null 2>&1; then echo "::error::elf2xex is required to produce default.xex."; exit 1; fi
           make check
+          make toolchain-check
           make xex
           test -s build/default.xex
           sha256sum build/default.xex > build/SHA256SUMS.txt
