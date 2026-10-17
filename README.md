@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.15b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.16b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -245,3 +245,10 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 
 - Testes adicionais verificam que o objeto de saída não é modificado quando o lookup encontra múltiplas entradas válidas ou não encontra nenhuma tradução.
 - Os casos complementam a V2.0.14b; foram registrados como código de teste, mas não são apresentados como aprovados até haver execução real da suíte.
+
+
+## V2.0.16b — regressões de ASID e mapeamentos globais
+
+- Acrescentados casos de teste para confirmar que uma entrada não global de outro ASID não atende ao lookup, enquanto uma entrada global pode atender ao ASID atual.
+- O caso também verifica que uma entrada global e uma entrada não global que passam a corresponder simultaneamente geram `PS2_EE_TLB_ERR_MULTIPLE`, sem escolher uma tradução arbitrária.
+- **Estado:** testes adicionados ao repositório; execução da suíte, build Xenon, geração de `default.xex` e boot em console ainda não confirmados. Isto melhora a cobertura do protótipo TLB, mas não torna o emulador funcional nem justifica declarar 25% de implementação global.
