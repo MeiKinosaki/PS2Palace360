@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.13b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.14b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -231,3 +231,11 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 - `elf2xex` grava primeiro em `build/default.xex.tmp`; o Makefile só renomeia para `build/default.xex` depois de verificar que o arquivo temporário não está vazio.
 - Se a conversão falhar, o arquivo temporário é removido e o nome final não é publicado por esta etapa. Isso reduz o risco de deixar um XEX parcial com nome de artefato final.
 - A checagem é integridade básica por tamanho; não valida cabeçalho XEX, carregamento em console ou execução de jogos.
+
+
+## V2.0.14b — lookup TLB ignora entradas inválidas
+
+- Corrigido `ps2_ee_tlb_lookup`: entradas marcadas como inválidas deixam de ser retornadas como acertos e não podem sombrear uma entrada válida posterior.
+- O helper agora retorna `PS2_EE_TLB_ERR_MULTIPLE` quando há mais de uma entrada válida compatível com página e ASID/global, mantendo o parâmetro de saída intacto em miss/conflito.
+- Foram adicionados casos de regressão para entrada inválida e conflito duplicado. Os testes foram escritos, mas a execução precisa de log CI/host antes de declarar aprovação.
+- A TLB continua experimental: páginas fixas de 4 KiB, 16 entradas e sem integração completa com CP0/R5900.
