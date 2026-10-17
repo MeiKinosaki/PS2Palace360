@@ -218,6 +218,13 @@ int main(void)
       assert(ps2_ee_tlb_write(&tlb, 4, UINT32_C(0x00401000), UINT32_C(0x00006000), 3, 0, 1, 0) == PS2_EE_TLB_OK);
       assert(ps2_ee_tlb_count_matches(&tlb, UINT32_C(0x00401000)) == 3);
       assert(ps2_ee_tlb_count_matches(NULL, 0) == 0);
+      /* V2.0.3b: translation must not silently choose among duplicate valid mappings. */
+      { uint32_t physical = UINT32_C(0xdeadbeef);
+        assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00401020), 0, &physical) == PS2_EE_TLB_ERR_MULTIPLE);
+        assert(physical == UINT32_C(0xdeadbeef));
+        assert(ps2_ee_tlb_invalidate_all(&tlb) == PS2_EE_TLB_OK);
+        assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00401020), 0, &physical) == PS2_EE_TLB_ERR_MISS);
+      }
     }
     /* v0.101b: experimental 4 KiB TLB translation. */
     { ps2_ee_tlb_t tlb; uint32_t physical=UINT32_C(0xfeedface);
