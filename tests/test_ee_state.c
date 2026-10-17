@@ -201,6 +201,24 @@ int main(void)
       assert(ps2_ee_tlb_invalidate_asid(&tlb, 7) == PS2_EE_TLB_OK);
       assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00402004), 0, &physical) == PS2_EE_TLB_OK && physical == UINT32_C(0x00003004));
     }
+    /* V2.0.2b: duplicate-match diagnostic respects ASID/global and valid bits. */
+    { ps2_ee_tlb_t tlb;
+      ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_tlb_count_matches(&tlb, UINT32_C(0x00401234)) == 0);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00401000), UINT32_C(0x00002000), 3, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_count_matches(&tlb, UINT32_C(0x00401234)) == 0);
+      assert(ps2_ee_tlb_set_asid(&tlb, 3) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_count_matches(&tlb, UINT32_C(0x00401234)) == 1);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x00401000), UINT32_C(0x00003000), 3, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_count_matches(&tlb, UINT32_C(0x00401fff)) == 2);
+      assert(ps2_ee_tlb_write(&tlb, 2, UINT32_C(0x00401000), UINT32_C(0x00004000), 9, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_count_matches(&tlb, UINT32_C(0x00401000)) == 2);
+      assert(ps2_ee_tlb_write(&tlb, 3, UINT32_C(0x00401000), UINT32_C(0x00005000), 9, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_count_matches(&tlb, UINT32_C(0x00401000)) == 3);
+      assert(ps2_ee_tlb_write(&tlb, 4, UINT32_C(0x00401000), UINT32_C(0x00006000), 3, 0, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_count_matches(&tlb, UINT32_C(0x00401000)) == 3);
+      assert(ps2_ee_tlb_count_matches(NULL, 0) == 0);
+    }
     /* v0.101b: experimental 4 KiB TLB translation. */
     { ps2_ee_tlb_t tlb; uint32_t physical=UINT32_C(0xfeedface);
       ps2_ee_tlb_reset(&tlb);
