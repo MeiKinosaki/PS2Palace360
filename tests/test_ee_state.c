@@ -257,6 +257,19 @@ int main(void)
       assert(ps2_ee_tlb_write(&tlb, 0, 1, 0, 0, 1, 1, 0) == PS2_EE_TLB_ERR_ARGUMENT);
       assert(ps2_ee_tlb_translate(NULL, 0, 0, &physical) == PS2_EE_TLB_ERR_ARGUMENT);
     }
+
+    /* V2.0.16b: lookup must isolate ASIDs while global entries match all ASIDs. */
+    { ps2_ee_tlb_t tlb; ps2_ee_tlb_entry_t entry;
+      ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_tlb_set_asid(&tlb, 5) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00500000), UINT32_C(0x00100000), 4, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x00500123), &entry) == PS2_EE_TLB_ERR_MISS);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x00500000), UINT32_C(0x00200000), 9, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x00500123), &entry) == PS2_EE_TLB_OK && entry.physical_page == UINT32_C(0x00200000) && entry.global);
+      assert(ps2_ee_tlb_set_asid(&tlb, 4) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x00500123), &entry) == PS2_EE_TLB_ERR_MULTIPLE);
+    }
+
     /* v0.90b: detailed translation errors without breaking the legacy API. */
     { uint32_t physical=UINT32_C(0xfeedface);
       assert(ps2_ee_translate_address_ex(UINT32_C(0x80001234), &physical) == PS2_EE_TRANSLATE_OK);
