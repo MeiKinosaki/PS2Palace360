@@ -327,5 +327,29 @@ int main(void)
       ps2_ee_raise_exception(&s, UINT32_C(0x1234), PS2_EE_EXC_RI, 0);
       assert(s.epc == saved_epc && s.cause == saved_cause); }
     ps2_ee_raise_exception(NULL, 0, PS2_EE_EXC_INT, 0);
-    puts("OK: EE helpers, decoder, 64-bit shifts/arithmetic, HI/LO and memory/step tests.");return 0;
+
+    /* V2.0.19b: scalar load/store instructions use the direct-map/TLB dispatcher. */
+    { ps2_ee_tlb_t tlb;
+      ps2_ee_tlb_reset(&tlb);
+      /* Map virtual 0x00001000 to physical RAM 0x20 for this isolated test. */
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00001000), UINT32_C(0x00000020), 0, 1, 1, 0) == PS2_EE_TLB_OK);
+      s.gpr[1] = UINT32_C(0x00001000);
+      assert(ps2_ee_mem_store(&mem, 0x20, 4, UINT32_C(0x80ff7f01)) == 0);
+      assert(ps2_ee_execute_memory_word_tlb(&s, &mem, &tlb,
+          (0x23u<<26)|(1u<<21)|(2u<<16)) == PS2_EE_STEP_OK);
+      assert(s.gpr[2] == UINT64_C(0xffffffff80ff7f01));
+      assert(ps2_ee_execute_memory_word_tlb(&s, &mem, &tlb,
+          (0x27u<<26)|(1u<<21)|(3u<<16)) == PS2_EE_STEP_OK);
+      assert(s.gpr[3] == UINT32_C(0x80ff7f01));
+      s.gpr[4] = UINT32_C(0x1234abcd);
+      assert(ps2_ee_execute_memory_word_tlb(&s, &mem, &tlb,
+          (0x2bu<<26)|(1u<<21)|(4u<<16)|4u) == PS2_EE_STEP_OK);
+      assert(ps2_ee_mem_load(&mem, 0x24, 4, &loaded) == 0 && loaded == UINT32_C(0x1234abcd));
+      assert(ps2_ee_execute_memory_word_tlb(&s, &mem, &tlb,
+          (0x23u<<26)|(1u<<21)|(5u<<16)|UINT32_C(0x1000)) == PS2_EE_STEP_INVALID);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x00001000), UINT32_C(0x00000020), 0, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_execute_memory_word_tlb(&s, &mem, &tlb,
+          (0x23u<<26)|(1u<<21)|(2u<<16)) == PS2_EE_STEP_INVALID);
+    }
+\n    puts("OK: EE helpers, decoder, TLB-backed scalar memory ops, arithmetic and memory tests.");return 0;
 }
