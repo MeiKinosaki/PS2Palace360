@@ -183,3 +183,20 @@ int ps2_ee_tlb_invalidate_asid(ps2_ee_tlb_t *tlb, uint8_t asid)
     }
     return PS2_EE_TLB_OK;
 }
+
+
+/* v0.103b: combine direct-mapped segments with the experimental TLB.
+ * No CP0 exception entry or privilege-mode enforcement is performed here. */
+int ps2_ee_translate_address_with_tlb(const ps2_ee_tlb_t *tlb,
+                                      uint32_t virtual_address, int is_write,
+                                      uint32_t *physical_address)
+{
+    uint32_t segment;
+    if (physical_address == 0) return PS2_EE_TLB_ERR_ARGUMENT;
+    segment = virtual_address & UINT32_C(0xE0000000);
+    if (segment == UINT32_C(0x80000000) || segment == UINT32_C(0xA0000000)) {
+        *physical_address = virtual_address & UINT32_C(0x1FFFFFFF);
+        return PS2_EE_TLB_OK;
+    }
+    return ps2_ee_tlb_translate(tlb, virtual_address, is_write, physical_address);
+}
