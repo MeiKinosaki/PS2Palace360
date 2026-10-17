@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.102b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.103b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -79,3 +79,10 @@ Foram preservados os marcos de documentação v0.92b–v0.100b; o avanço com c�
 - Adicionadas rotinas para selecionar ASID atual, consultar uma entrada por índice e invalidar entradas não globais de um ASID.
 - Acrescentados testes de regressão para consulta, invalidação seletiva (entradas globais preservadas) e argumentos inválidos.
 - Estes helpers operam sobre a tabela experimental em memória; ainda não reproduzem os comandos CP0 nem toda a semântica TLB do R5900. Testes escritos não significam execução confirmada.
+
+
+## v0.103b — Despachante de tradução
+
+- Adicionada função experimental que escolhe tradução direta para KSEG0/KSEG1 e consulta a tabela TLB de protótipo para outros endereços.
+- Testes escritos para tradução direta, miss sem alterar o endereço de saída, acerto via TLB e ponteiro inválido.
+- Não está ligada automaticamente aos acessos `ps2_ee_mem_load_virtual_ex`/`store`; também não implementa CP0 nem exceções de TLB. Execução dos testes não confirmada.
