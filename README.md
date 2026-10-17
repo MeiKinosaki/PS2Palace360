@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.16b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.19b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -252,3 +252,11 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 - Acrescentados casos de teste para confirmar que uma entrada não global de outro ASID não atende ao lookup, enquanto uma entrada global pode atender ao ASID atual.
 - O caso também verifica que uma entrada global e uma entrada não global que passam a corresponder simultaneamente geram `PS2_EE_TLB_ERR_MULTIPLE`, sem escolher uma tradução arbitrária.
 - **Estado:** testes adicionados ao repositório; execução da suíte, build Xenon, geração de `default.xex` e boot em console ainda não confirmados. Isto melhora a cobertura do protótipo TLB, mas não torna o emulador funcional nem justifica declarar 25% de implementação global.
+
+
+## V2.0.19b — Instruções escalares de memória com tradução TLB experimental
+
+- Adicionada a API `ps2_ee_execute_memory_word_tlb`, que encaminha LB/LBU, LH/LHU, LW/LWU, LD, SB/SH/SW/SD ao caminho de memória virtual com tradução direta KSEG0/KSEG1 ou TLB experimental.
+- A extensão de sinal de LB/LH/LW é aplicada na carga; LBU/LHU/LWU preservam o valor sem sinal.
+- Acrescentados casos de teste para LW com extensão de sinal, LWU, SW, endereço sem mapeamento e múltiplas correspondências TLB.
+- **Limitações:** a API é explícita e não substitui ainda o caminho antigo de execução; falhas de tradução/acesso retornam `PS2_EE_STEP_INVALID` e ainda não geram exceções CP0 arquiteturalmente corretas. Não foram declarados testes executados nem build Xenon concluído nesta rodada. O runtime continua placeholder e `default.xex` funcional permanece não validado.
