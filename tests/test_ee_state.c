@@ -124,6 +124,16 @@ int main(void)
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
                                    &loaded) == -1);
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
+    /* v0.109b: TLB valid-entry diagnostic count. */
+    { ps2_ee_tlb_t tlb; ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_tlb_count_valid(&tlb) == 0);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x1000), UINT32_C(0x3000), 0, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x2000), UINT32_C(0x4000), 0, 0, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_count_valid(&tlb) == 1);
+      assert(ps2_ee_tlb_invalidate_asid(&tlb, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_count_valid(&tlb) == 0);
+      assert(ps2_ee_tlb_count_valid(NULL) == 0);
+    }
     /* v0.107b: TLB page permission status helper. */
     { ps2_ee_tlb_t tlb; ps2_ee_tlb_reset(&tlb);
       assert(ps2_ee_tlb_check_page(&tlb, UINT32_C(0x1000), 0) == PS2_EE_TLB_ERR_MISS);
