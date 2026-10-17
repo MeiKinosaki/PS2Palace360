@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.10b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.11b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -212,3 +212,9 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 
 - O alvo ELF intermediário agora depende também de `validate`, além da verificação da toolchain. Assim, `make xex` aplica as checagens estruturais antes de invocar `xenon-gcc`.
 - A checagem pode ser repetida por Make, mas é idempotente e não altera fontes. Nenhum build foi declarado aprovado sem logs.
+
+
+## V2.0.11b — diagnóstico de disponibilidade da toolchain no CI
+
+- A etapa de validação host agora registra se `xenon-gcc` e `elf2xex` estão presentes no runner, sem falhar o conjunto de testes host só por faltar a toolchain Xenon.
+- O job Xbox continua exigindo ambas as ferramentas e falhará explicitamente se não estiverem instaladas; esta alteração não instala libXenon nem comprova build XEX.
