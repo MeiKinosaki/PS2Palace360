@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.92b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.93b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -28,3 +28,7 @@ Consulte [LICENSE](LICENSE).
 ### v0.92b — Add address-range helper for direct-mapped segments
 
 Escopo: definir com precisão os intervalos aceitos pela tradução direta experimental, sem tratar o buffer de teste como RAM física real.
+
+### v0.93b — Add tests for direct-mapped range helper
+
+Escopo: ampliar regressões para limites de segmentos e assegurar que falhas não alterem saídas. A execução permanece pendente até haver resultado de teste verificável.
