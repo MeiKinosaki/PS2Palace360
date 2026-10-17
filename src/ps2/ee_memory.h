@@ -10,6 +10,42 @@ enum {
     PS2_EE_TRANSLATE_ERR_UNSUPPORTED = -2
 };
 
+/* v0.101b: TLB scaffold result codes. */
+enum {
+    PS2_EE_TLB_OK = 0,
+    PS2_EE_TLB_ERR_ARGUMENT = -1,
+    PS2_EE_TLB_ERR_MISS = -2,
+    PS2_EE_TLB_ERR_INVALID = -3,
+    PS2_EE_TLB_ERR_MODIFIED = -4
+};
+
+typedef struct ps2_ee_tlb_entry {
+    uint32_t virtual_page;
+    uint32_t physical_page;
+    uint8_t asid;
+    uint8_t valid;
+    uint8_t dirty;
+    uint8_t global;
+} ps2_ee_tlb_entry_t;
+
+enum {
+    PS2_EE_TLB_ENTRY_COUNT = 16,
+    PS2_EE_TLB_PAGE_SHIFT = 12,
+    PS2_EE_TLB_PAGE_SIZE = 4096
+};
+
+typedef struct ps2_ee_tlb {
+    ps2_ee_tlb_entry_t entries[PS2_EE_TLB_ENTRY_COUNT];
+    uint8_t current_asid;
+} ps2_ee_tlb_t;
+
+void ps2_ee_tlb_reset(ps2_ee_tlb_t *tlb);
+int ps2_ee_tlb_write(ps2_ee_tlb_t *tlb, unsigned index,
+                     uint32_t virtual_page, uint32_t physical_page,
+                     uint8_t asid, int valid, int dirty, int global);
+int ps2_ee_tlb_translate(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
+                         int is_write, uint32_t *physical_address);
+
 enum {
     PS2_EE_MEM_OK = 0,
     PS2_EE_MEM_ERR_ARGUMENT = -1,
