@@ -10,6 +10,13 @@ enum {
     PS2_EE_TRANSLATE_ERR_UNSUPPORTED = -2
 };
 
+enum {
+    PS2_EE_MEM_OK = 0,
+    PS2_EE_MEM_ERR_ARGUMENT = -1,
+    PS2_EE_MEM_ERR_TRANSLATION = -2,
+    PS2_EE_MEM_ERR_ACCESS = -3
+};
+
 typedef struct ps2_ee_memory {
     uint8_t *ram;
     size_t ram_size;
@@ -34,4 +41,9 @@ int ps2_ee_mem_load_virtual(ps2_ee_memory_t *mem, uint32_t virtual_address,
                             unsigned width, uint64_t *value);
 int ps2_ee_mem_store_virtual(ps2_ee_memory_t *mem, uint32_t virtual_address,
                              unsigned width, uint64_t value);
+/* Detailed virtual accessors distinguish translation from RAM/access errors. */
+int ps2_ee_mem_load_virtual_ex(ps2_ee_memory_t *mem, uint32_t virtual_address,
+                               unsigned width, uint64_t *value);
+int ps2_ee_mem_store_virtual_ex(ps2_ee_memory_t *mem, uint32_t virtual_address,
+                                unsigned width, uint64_t value);
 #endif
