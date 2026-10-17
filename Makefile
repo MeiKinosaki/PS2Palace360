@@ -40,6 +40,7 @@ check: validate test-host
 
 $(BUILD_DIR)/ps2palace360.elf: src/main.c $(EE_SOURCES) | $(BUILD_DIR) toolchain-check
 	$(XENON_CC) $(XENON_CFLAGS) -Isrc/ps2 src/main.c $(EE_SOURCES) -o $@
+	@test -s $@ || { echo "ERRO: o compilador não produziu um ELF intermediário válido."; rm -f $@; exit 2; }
 
 toolchain-check:
 	@command -v $(XENON_CC) >/dev/null 2>&1 || { echo "ERRO: $(XENON_CC) não encontrado; configure libXenon no runner."; exit 2; }
@@ -47,6 +48,7 @@ toolchain-check:
 	@echo "OK: ferramentas da toolchain Xenon encontradas."
 
 $(BUILD_DIR)/default.xex: $(BUILD_DIR)/ps2palace360.elf
+	@test -s $< || { echo "ERRO: ELF intermediário ausente ou vazio."; exit 2; }
 	$(ELF2XEX) $< $@
 	@test -s $@ || { echo "ERRO: default.xex não foi gerado."; exit 2; }
 
