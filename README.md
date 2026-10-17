@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.4b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.5b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -171,3 +171,10 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 - O ELF intermediário é chamado `build/ps2palace360.elf` e não é publicado como artefato final.
 - O workflow verifica as ferramentas necessárias e publica somente `build/default.xex` e seu checksum.
 - Limite importante: `src/main.c` continua sendo um bootstrap vazio; gerar um XEX não significa que o emulador tenha runtime Xbox funcional ou consiga executar jogos PS2. Build ainda depende de runner com libXenon e elf2xex; a execução não foi confirmada nesta atualização.
+
+
+## V2.0.5b — pré-verificação explícita da toolchain
+
+- Adicionado o alvo `make toolchain-check`, que verifica `xenon-gcc` e `elf2xex` antes da etapa de geração do `default.xex`.
+- O workflow chama a pré-verificação antes do build e mantém a publicação condicionada ao sucesso de todas as etapas.
+- Isto melhora o diagnóstico de dependências, mas não instala automaticamente a toolchain no runner do GitHub. O bootstrap em `src/main.c` continua vazio; build, testes e execução em console permanecem não verificados.
