@@ -280,3 +280,21 @@ int ps2_ee_tlb_invalidate_all(ps2_ee_tlb_t *tlb)
         tlb->entries[i].valid = 0;
     return PS2_EE_TLB_OK;
 }
+
+
+/* V2.0.2b: count valid entries matching a page under the active ASID.
+ * Diagnostic only: it reports duplicates but does not emulate TLB shutdown. */
+unsigned ps2_ee_tlb_count_matches(const ps2_ee_tlb_t *tlb, uint32_t virtual_address)
+{
+    uint32_t page;
+    unsigned i, count = 0;
+    if (tlb == 0) return 0;
+    page = virtual_address & ~(uint32_t)(PS2_EE_TLB_PAGE_SIZE - 1u);
+    for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i) {
+        const ps2_ee_tlb_entry_t *e = &tlb->entries[i];
+        if (e->valid && e->virtual_page == page &&
+            (e->global || e->asid == tlb->current_asid))
+            ++count;
+    }
+    return count;
+}
