@@ -31,6 +31,7 @@ typedef struct ps2_ee_state {
     uint32_t cause;
     uint32_t status;
     uint32_t epc;
+    uint32_t badvaddr; /* Experimental CP0.BadVAddr shadow for TLB/address faults. */
 } ps2_ee_state_t;
 
 /* Initial MIPS-style exception entry; exc_code is the Cause.ExcCode value. */
