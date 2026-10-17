@@ -351,7 +351,7 @@ int main(void)
       assert(ps2_ee_execute_memory_word_tlb(&s, &mem, &tlb,
           (0x23u<<26)|(1u<<21)|(2u<<16)) == PS2_EE_STEP_INVALID);
     }
-\n
+
     /* V2.0.20b: execute one instruction fetched through the TLB-backed path. */
     { ps2_ee_tlb_t tlb;
       ps2_ee_tlb_reset(&tlb);
