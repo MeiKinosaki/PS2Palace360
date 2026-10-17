@@ -54,20 +54,45 @@ int ps2_ee_mem_store(ps2_ee_memory_t *m, uint32_t address,
     return 0;
 }
 
+int ps2_ee_mem_load_virtual_ex(ps2_ee_memory_t *m, uint32_t virtual_address,
+                               unsigned width, uint64_t *value)
+{
+    uint32_t physical_address;
+    int status;
+    if (value == 0 || m == 0 || m->ram == 0)
+        return PS2_EE_MEM_ERR_ARGUMENT;
+    status = ps2_ee_translate_address_ex(virtual_address, &physical_address);
+    if (status != PS2_EE_TRANSLATE_OK)
+        return PS2_EE_MEM_ERR_TRANSLATION;
+    return ps2_ee_mem_load(m, physical_address, width, value) == 0
+           ? PS2_EE_MEM_OK : PS2_EE_MEM_ERR_ACCESS;
+}
+
+int ps2_ee_mem_store_virtual_ex(ps2_ee_memory_t *m, uint32_t virtual_address,
+                                unsigned width, uint64_t value)
+{
+    uint32_t physical_address;
+    int status;
+    if (m == 0 || m->ram == 0)
+        return PS2_EE_MEM_ERR_ARGUMENT;
+    status = ps2_ee_translate_address_ex(virtual_address, &physical_address);
+    if (status != PS2_EE_TRANSLATE_OK)
+        return PS2_EE_MEM_ERR_TRANSLATION;
+    return ps2_ee_mem_store(m, physical_address, width, value) == 0
+           ? PS2_EE_MEM_OK : PS2_EE_MEM_ERR_ACCESS;
+}
+
+/* Compatibility wrappers preserve the original 0/-1 behavior. */
 int ps2_ee_mem_load_virtual(ps2_ee_memory_t *m, uint32_t virtual_address,
                             unsigned width, uint64_t *value)
 {
-    uint32_t physical_address;
-    if (ps2_ee_translate_address(virtual_address, &physical_address) != 0)
-        return -1;
-    return ps2_ee_mem_load(m, physical_address, width, value);
+    return ps2_ee_mem_load_virtual_ex(m, virtual_address, width, value) ==
+           PS2_EE_MEM_OK ? 0 : -1;
 }
 
 int ps2_ee_mem_store_virtual(ps2_ee_memory_t *m, uint32_t virtual_address,
                              unsigned width, uint64_t value)
 {
-    uint32_t physical_address;
-    if (ps2_ee_translate_address(virtual_address, &physical_address) != 0)
-        return -1;
-    return ps2_ee_mem_store(m, physical_address, width, value);
+    return ps2_ee_mem_store_virtual_ex(m, virtual_address, width, value) ==
+           PS2_EE_MEM_OK ? 0 : -1;
 }
