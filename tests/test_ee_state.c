@@ -124,6 +124,16 @@ int main(void)
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
                                    &loaded) == -1);
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
+    /* v0.103b: unified address translation. */
+    { ps2_ee_tlb_t tlb; uint32_t physical=UINT32_C(0xfeedface);
+      ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_translate_address_with_tlb(&tlb, UINT32_C(0x80001234), 0, &physical) == PS2_EE_TLB_OK && physical == UINT32_C(0x1234));
+      physical=UINT32_C(0xfeedface);
+      assert(ps2_ee_translate_address_with_tlb(&tlb, UINT32_C(0x00401234), 0, &physical) == PS2_EE_TLB_ERR_MISS && physical == UINT32_C(0xfeedface));
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00401000), UINT32_C(0x00002000), 0, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_translate_address_with_tlb(&tlb, UINT32_C(0x00401234), 0, &physical) == PS2_EE_TLB_OK && physical == UINT32_C(0x2234));
+      assert(ps2_ee_translate_address_with_tlb(&tlb, 0, 0, NULL) == PS2_EE_TLB_ERR_ARGUMENT);
+    }
     /* v0.102b: TLB entry inspection, ASID selection and invalidation. */
     { ps2_ee_tlb_t tlb; ps2_ee_tlb_entry_t entry; uint32_t physical=0;
       ps2_ee_tlb_reset(&tlb);
