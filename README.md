@@ -278,3 +278,7 @@ O caminho experimental `ps2_ee_step_tlb` busca a instrução via TLB e encaminha
 ## Backlog de engenharia
 
 O plano granular de 20.000 etapas está em [`docs/ROADMAP_20000_ETAPAS.md`](docs/ROADMAP_20000_ETAPAS.md). Os itens começam pendentes; a lista não representa 20.000 implementações concluídas. O cabeçalho do decodificador e o arquivo de testes tiveram escapes de nova linha literais corrigidos. A validação automatizada ainda precisa de uma execução aprovada para confirmar compilação e testes.
+
+## Plano de 10.000.000 de etapas
+
+O plano de dez milhões de tarefas é documentado em [`docs/PLANO_10000000_ETAPAS.md`](docs/PLANO_10000000_ETAPAS.md), com gerador paginado em [`tools/generate_10000000_step_backlog.py`](tools/generate_10000000_step_backlog.py). Para evitar um arquivo impraticável, o gerador emite até 100.000 itens por execução. Todos começam pendentes; a quantidade de tarefas planejadas não representa progresso funcional nem substitui build/testes.
