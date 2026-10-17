@@ -35,6 +35,7 @@ validate:
 	@for f in $(EE_SOURCES); do test -s "$f" || { echo "ERRO: módulo EE ausente ou vazio: $f"; exit 2; }; done
 	@test -s src/main.c || { echo "ERRO: src/main.c ausente ou vazio."; exit 2; }
 	@grep -Eq 'int[[:space:]]+main[[:space:]]*\(' src/main.c || { echo "ERRO: src/main.c não declara main()."; exit 2; }
+	@grep -Eq 'placeholder|not an Xbox 360 entrypoint yet' src/main.c && { echo "AVISO: src/main.c ainda é placeholder; XEX não representa runtime Xbox funcional."; } || true
 	@echo "OK: arquivos mínimos e entrypoint main() presentes (sem validar runtime Xbox)."
 
 test-host: $(HOST_TEST)
