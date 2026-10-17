@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.0b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.1b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -130,3 +130,10 @@ As etapas v0.101b–v0.110b não equivalem a uma MMU completa nem a dez versões
 A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V2.0.1b, V2.0.2b, V2.0.3b…**, avançando uma versão por vez sem saltos. A série anterior (v0.101b–v0.110b) permanece no histórico como histórico técnico; não é apagada nem renumerada retroativamente.
 
 **Versão oficial atual: V2.0.0b.** A mudança de número é uma decisão de versionamento, não uma alegação de que a emulação de PS2 está pronta ou que os testes/builds foram aprovados.
+
+
+## V2.0.1b — Invalidação integral da TLB experimental
+
+- Implementada `ps2_ee_tlb_invalidate_all`, que marca todas as entradas como inválidas, incluindo entradas globais; não apaga seus metadados e não altera o ASID atual.
+- Adicionados testes para entradas globais e não globais, contador de entradas válidas após invalidação, miss posterior e argumento nulo.
+- O código e os testes foram enviados ao repositório. **A execução da suíte e a compilação continuam não confirmadas**; a TLB segue como protótipo de páginas fixas de 4 KiB, sem integração completa com CP0 e exceções arquiteturais.
