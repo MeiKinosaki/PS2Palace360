@@ -124,6 +124,15 @@ int main(void)
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
                                    &loaded) == -1);
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
+    /* v0.105b: TLB lookup by virtual page. */
+    { ps2_ee_tlb_t tlb; ps2_ee_tlb_entry_t entry;
+      ps2_ee_tlb_reset(&tlb); tlb.current_asid=2;
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00401000), UINT32_C(0x00002000), 1, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x00401001), &entry) == PS2_EE_TLB_ERR_MISS);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x00401000), UINT32_C(0x00003000), 2, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_lookup(&tlb, UINT32_C(0x00401abc), &entry) == PS2_EE_TLB_OK && entry.physical_page == UINT32_C(0x00003000));
+      assert(ps2_ee_tlb_lookup(&tlb, 0, NULL) == PS2_EE_TLB_ERR_ARGUMENT);
+    }
     /* v0.104b: TLB-aware memory accessors. */
     { ps2_ee_tlb_t tlb; uint64_t value=0;
       ps2_ee_tlb_reset(&tlb);
