@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.104b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.108b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -93,3 +93,20 @@ Foram preservados os marcos de documentação v0.92b–v0.100b; o avanço com c�
 - Adicionadas funções separadas para leitura/escrita virtual que passam pelo despachante de tradução direta/TLB antes de validar e acessar o buffer RAM de teste.
 - Adicionados testes para acesso traduzido, miss, argumentos inválidos e leitura/escrita básica.
 - Limitações: os acessos antigos não foram redirecionados automaticamente para esta API; a RAM continua sendo um buffer de teste, não o mapa físico completo do PS2. O código de TLB é um protótipo de páginas de 4 KiB, não a MMU R5900 completa. Testes escritos não confirmam execução.
+
+
+## v0.105b — Consulta de entrada TLB
+
+- Helper de consulta por página virtual com filtro por ASID/global; testes de hit/miss e ponteiro inválido foram escritos.
+
+## v0.106b — Regressões da consulta TLB
+
+- Testes adicionais registram filtragem por ASID e escolha de entrada correspondente. Execução não confirmada.
+
+## v0.107b — Verificação de permissões TLB
+
+- Helper separa consulta da página e validação de entrada válida/permissão de escrita, sem traduzir endereço físico.
+
+## v0.108b — Testes de permissões TLB
+
+- Adicionados casos para miss, invalid, leitura permitida, escrita sem dirty e escrita permitida. O TLB continua experimental, sem integração completa com CP0 ou exceções arquiteturais.
