@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: v0.96b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: v0.97b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -44,3 +44,7 @@ Invariantes documentadas: larguras permitidas 1/2/4/8 bytes, alinhamento natural
 ### v0.96b — Add TLB implementation checklist
 
 Checklist MMU/TLB: formato de entradas, ASID/global, permissões, exceções TLB refill/invalid/modified, tradução de páginas e testes de conflito ainda não implementados.
+
+### v0.97b — Add host validation checklist
+
+Checklist de host: executar `make validate`, `make test-host` e registrar saída/compilador; nenhuma execução é declarada bem-sucedida sem logs.
