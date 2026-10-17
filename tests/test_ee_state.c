@@ -124,6 +124,16 @@ int main(void)
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
                                    &loaded) == -1);
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
+    /* V2.0.1b: invalidate all TLB entries, including global mappings. */
+    { ps2_ee_tlb_t tlb; ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x1000), UINT32_C(0x3000), 1, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x2000), UINT32_C(0x4000), 2, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_count_valid(&tlb) == 2);
+      assert(ps2_ee_tlb_invalidate_all(&tlb) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_count_valid(&tlb) == 0);
+      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x2004), 0, &(uint32_t){0}) == PS2_EE_TLB_ERR_MISS);
+      assert(ps2_ee_tlb_invalidate_all(NULL) == PS2_EE_TLB_ERR_ARGUMENT);
+    }
     /* v0.109b: TLB valid-entry diagnostic count. */
     { ps2_ee_tlb_t tlb; ps2_ee_tlb_reset(&tlb);
       assert(ps2_ee_tlb_count_valid(&tlb) == 0);
