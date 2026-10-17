@@ -1,6 +1,9 @@
 CC ?= cc
 CFLAGS ?= -std=c11 -Wall -Wextra -Werror -pedantic -O2
 BUILD_DIR := build
+XENON_CC ?= xenon-gcc
+ELF2XEX ?= elf2xex
+XENON_CFLAGS ?= -O2 -Wall -Wextra
 EE_SOURCES := src/ps2/ee_state.c src/ps2/ee_ops.c src/ps2/ee_immediate.c src/ps2/ee_compare.c src/ps2/ee_decode.c src/ps2/ee_memory.c
 HOST_TEST := $(BUILD_DIR)/test_ee_state
 
@@ -35,9 +38,17 @@ test-host: $(HOST_TEST)
 
 check: validate test-host
 
-xex:
-	@echo "ERRO: alvo Xbox ainda nao implementado. Requer toolchain libXenon verificada, entrypoint Xbox e comando elf2xex validado."
-	@exit 2
+$(BUILD_DIR)/ps2palace360.elf: src/main.c $(EE_SOURCES) | $(BUILD_DIR)
+	@command -v $(XENON_CC) >/dev/null 2>&1 || { echo "ERRO: $(XENON_CC) não encontrado; configure libXenon no runner."; exit 2; }
+	$(XENON_CC) $(XENON_CFLAGS) -Isrc/ps2 src/main.c $(EE_SOURCES) -o $@
+
+$(BUILD_DIR)/default.xex: $(BUILD_DIR)/ps2palace360.elf
+	@command -v $(ELF2XEX) >/dev/null 2>&1 || { echo "ERRO: $(ELF2XEX) não encontrado; configure a ferramenta de conversão XEX."; exit 2; }
+	$(ELF2XEX) $< $@
+	@test -s $@ || { echo "ERRO: default.xex não foi gerado."; exit 2; }
+
+xex: $(BUILD_DIR)/default.xex
+	@echo "OK: artefato principal gerado em $(BUILD_DIR)/default.xex"
 
 clean:
 	rm -rf $(BUILD_DIR)
