@@ -124,6 +124,15 @@ int main(void)
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
                                    &loaded) == -1);
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
+    /* v0.90b: detailed translation errors without breaking the legacy API. */
+    { uint32_t physical=UINT32_C(0xfeedface);
+      assert(ps2_ee_translate_address_ex(UINT32_C(0x80001234), &physical) == PS2_EE_TRANSLATE_OK);
+      assert(physical == UINT32_C(0x1234)); }
+    { uint32_t physical=UINT32_C(0xfeedface);
+      assert(ps2_ee_translate_address_ex(UINT32_C(0x00001000), &physical) == PS2_EE_TRANSLATE_ERR_UNSUPPORTED);
+      assert(physical == UINT32_C(0xfeedface)); }
+    assert(ps2_ee_translate_address_ex(UINT32_C(0x80000000), NULL) == PS2_EE_TRANSLATE_ERR_ARGUMENT);
+    assert(PS2_EE_TRANSLATE_OK == 0 && PS2_EE_TRANSLATE_ERR_ARGUMENT == -1 && PS2_EE_TRANSLATE_ERR_UNSUPPORTED == -2);
     /* v0.89b: translation segment edges and failure-output stability. */
     { uint32_t physical=UINT32_C(0xfeedface);
       assert(ps2_ee_translate_address(UINT32_C(0x9fffffff), &physical) == 0);
