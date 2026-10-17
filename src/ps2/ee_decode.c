@@ -190,16 +190,29 @@ ps2_ee_step_result_t ps2_ee_execute_memory_word_tlb(ps2_ee_state_t *s,
     return PS2_EE_STEP_OK;
 }
 
-/* V2.0.20b: TLB-aware fetch/execute loop. This remains a prototype: faults
- * return INVALID instead of entering architecturally correct CP0 exceptions. */
+/* V2.0.22b: fetch-side TLB faults enter the prototype CP0 exception path.
+ * Delay-slot tracking and data-access BadVAddr/exception routing remain TODO. */
 ps2_ee_step_result_t ps2_ee_step_tlb(ps2_ee_state_t *s, ps2_ee_memory_t *mem,
                                     const ps2_ee_tlb_t *tlb)
 {
     uint64_t raw;
+    uint32_t physical;
+    int status;
     ps2_ee_step_result_t result;
     if (s == NULL || mem == NULL || tlb == NULL) return PS2_EE_STEP_INVALID;
-    if (ps2_ee_mem_load_virtual_tlb(mem, tlb, s->pc, 4, &raw) != PS2_EE_MEM_OK)
-        return PS2_EE_STEP_INVALID;
+    status = ps2_ee_tlb_translate(tlb, s->pc, 0, &physical);
+    if (status != PS2_EE_TLB_OK) {
+        s->badvaddr = s->pc;
+        ps2_ee_raise_exception(s, s->pc, PS2_EE_EXC_TLBL, 0);
+        s->gpr[0] = 0;
+        return PS2_EE_STEP_EXCEPTION;
+    }
+    if (ps2_ee_mem_load(mem, physical, 4, &raw) != 0) {
+        s->badvaddr = s->pc;
+        ps2_ee_raise_exception(s, s->pc, PS2_EE_EXC_IBE, 0);
+        s->gpr[0] = 0;
+        return PS2_EE_STEP_EXCEPTION;
+    }
     s->pc = s->next_pc;
     s->next_pc += 4u;
     result = ps2_ee_execute_memory_word_tlb(s, mem, tlb, (uint32_t)raw);
