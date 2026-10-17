@@ -42,7 +42,7 @@ test-host: $(HOST_TEST)
 
 check: validate test-host
 
-$(BUILD_DIR)/ps2palace360.elf: src/main.c $(EE_SOURCES) | $(BUILD_DIR) toolchain-check
+$(BUILD_DIR)/ps2palace360.elf: src/main.c $(EE_SOURCES) | $(BUILD_DIR) toolchain-check validate
 	$(XENON_CC) $(XENON_CFLAGS) -Isrc/ps2 src/main.c $(EE_SOURCES) -o $@
 	@test -s $@ || { echo "ERRO: o compilador não produziu um ELF intermediário válido."; rm -f $@; exit 2; }
 
