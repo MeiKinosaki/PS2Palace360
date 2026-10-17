@@ -245,3 +245,16 @@ int ps2_ee_mem_store_virtual_tlb(ps2_ee_memory_t *m, const ps2_ee_tlb_t *tlb,
     return ps2_ee_mem_store(m, physical_address, width, value) == 0
            ? PS2_EE_MEM_OK : PS2_EE_MEM_ERR_ACCESS;
 }
+
+
+/* v0.107b: permission/status-only check without forming a physical address. */
+int ps2_ee_tlb_check_page(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
+                          int is_write)
+{
+    ps2_ee_tlb_entry_t entry;
+    int status = ps2_ee_tlb_lookup(tlb, virtual_address, &entry);
+    if (status != PS2_EE_TLB_OK) return status;
+    if (!entry.valid) return PS2_EE_TLB_ERR_INVALID;
+    if (is_write && !entry.dirty) return PS2_EE_TLB_ERR_MODIFIED;
+    return PS2_EE_TLB_OK;
+}
