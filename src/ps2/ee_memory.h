@@ -49,6 +49,9 @@ int ps2_ee_tlb_write(ps2_ee_tlb_t *tlb, unsigned index,
                      uint8_t asid, int valid, int dirty, int global);
 int ps2_ee_tlb_translate(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
                          int is_write, uint32_t *physical_address);
+int ps2_ee_translate_address_with_tlb(const ps2_ee_tlb_t *tlb,
+                                      uint32_t virtual_address, int is_write,
+                                      uint32_t *physical_address);
 
 enum {
     PS2_EE_MEM_OK = 0,
