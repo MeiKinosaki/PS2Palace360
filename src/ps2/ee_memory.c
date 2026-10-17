@@ -1,16 +1,23 @@
 #include "ee_memory.h"
 
-int ps2_ee_translate_address(uint32_t virtual_address, uint32_t *physical_address)
+int ps2_ee_translate_address_ex(uint32_t virtual_address, uint32_t *physical_address)
 {
     uint32_t segment = virtual_address & UINT32_C(0xE0000000);
-    if (physical_address == 0) return -1;
+    if (physical_address == 0) return PS2_EE_TRANSLATE_ERR_ARGUMENT;
     /* KSEG0/KSEG1 are direct-mapped in this prototype only. */
     if (segment == UINT32_C(0x80000000) || segment == UINT32_C(0xA0000000)) {
         *physical_address = virtual_address & UINT32_C(0x1FFFFFFF);
-        return 0;
+        return PS2_EE_TRANSLATE_OK;
     }
     /* KUSEG/KSEG2 require a real TLB and are deliberately unsupported. */
-    return -1;
+    return PS2_EE_TRANSLATE_ERR_UNSUPPORTED;
+}
+
+/* Compatibility wrapper: preserve the original 0/-1 contract. */
+int ps2_ee_translate_address(uint32_t virtual_address, uint32_t *physical_address)
+{
+    return ps2_ee_translate_address_ex(virtual_address, physical_address) ==
+           PS2_EE_TRANSLATE_OK ? 0 : -1;
 }
 
 static int valid(const ps2_ee_memory_t *m, uint32_t address,
