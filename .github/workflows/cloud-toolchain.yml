@@ -67,18 +67,17 @@ jobs:
             echo "A reproducible, verified libXenon SDK setup is required before producing default.xex."
             exit 1
           fi
+          if ! command -v elf2xex >/dev/null 2>&1; then echo "::error::elf2xex is required to produce default.xex."; exit 1; fi
           make check
           make xex
-          test -s build/Xenon.elf
           test -s build/default.xex
-          sha256sum build/Xenon.elf build/default.xex > build/SHA256SUMS.txt
+          sha256sum build/default.xex > build/SHA256SUMS.txt
       - name: Upload Xbox binaries
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: PS2Palace360-X2.10-${{ github.run_number }}
+          name: PS2Palace360-default-xex-${{ github.run_number }}
           path: |
-            build/Xenon.elf
             build/default.xex
             build/SHA256SUMS.txt
           if-no-files-found: error
