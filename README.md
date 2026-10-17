@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.12b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.13b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ## Núcleo Emotion Engine (EE)
 
@@ -224,3 +224,10 @@ A partir deste marco, a numeração oficial passa a seguir a série **V2.0.0b, V
 
 - `make validate` agora emite aviso explícito quando detecta que `src/main.c` ainda está marcado como placeholder, sem converter essa limitação em falso sucesso de runtime.
 - A checagem continua estrutural; a implementação do entrypoint Xbox, vídeo, controles e loop principal segue pendente.
+
+
+## V2.0.13b — finalização protegida do XEX
+
+- `elf2xex` grava primeiro em `build/default.xex.tmp`; o Makefile só renomeia para `build/default.xex` depois de verificar que o arquivo temporário não está vazio.
+- Se a conversão falhar, o arquivo temporário é removido e o nome final não é publicado por esta etapa. Isso reduz o risco de deixar um XEX parcial com nome de artefato final.
+- A checagem é integridade básica por tamanho; não valida cabeçalho XEX, carregamento em console ou execução de jogos.
