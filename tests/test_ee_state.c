@@ -124,6 +124,22 @@ int main(void)
     assert(ps2_ee_mem_load_virtual(&mem, UINT32_C(0x00000010), 4,
                                    &loaded) == -1);
     assert(ps2_ee_mem_store_virtual(&mem, UINT32_C(0x80000040), 4, 1) == -1);
+    /* v0.102b: TLB entry inspection, ASID selection and invalidation. */
+    { ps2_ee_tlb_t tlb; ps2_ee_tlb_entry_t entry; uint32_t physical=0;
+      ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_tlb_set_asid(&tlb, 7) == PS2_EE_TLB_OK && tlb.current_asid == 7);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00401000), UINT32_C(0x00002000), 7, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_read(&tlb, 0, &entry) == PS2_EE_TLB_OK && entry.virtual_page == UINT32_C(0x00401000) && entry.physical_page == UINT32_C(0x00002000) && entry.asid == 7 && entry.valid && entry.dirty);
+      assert(ps2_ee_tlb_invalidate_asid(&tlb, 7) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00401004), 0, &physical) == PS2_EE_TLB_ERR_INVALID);
+      assert(ps2_ee_tlb_read(&tlb, PS2_EE_TLB_ENTRY_COUNT, &entry) == PS2_EE_TLB_ERR_ARGUMENT);
+      assert(ps2_ee_tlb_read(&tlb, 0, NULL) == PS2_EE_TLB_ERR_ARGUMENT);
+      assert(ps2_ee_tlb_set_asid(NULL, 1) == PS2_EE_TLB_ERR_ARGUMENT);
+      assert(ps2_ee_tlb_invalidate_asid(NULL, 1) == PS2_EE_TLB_ERR_ARGUMENT);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x00402000), UINT32_C(0x00003000), 7, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_invalidate_asid(&tlb, 7) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00402004), 0, &physical) == PS2_EE_TLB_OK && physical == UINT32_C(0x00003004));
+    }
     /* v0.101b: experimental 4 KiB TLB translation. */
     { ps2_ee_tlb_t tlb; uint32_t physical=UINT32_C(0xfeedface);
       ps2_ee_tlb_reset(&tlb);
