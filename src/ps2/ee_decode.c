@@ -118,7 +118,10 @@ ps2_ee_step_result_t ps2_ee_execute_word(ps2_ee_state_t *s, uint32_t insn)
     }
     s->gpr[0]=0; return PS2_EE_STEP_OK;
 done:
-    if(rc==-1)return PS2_EE_STEP_INVALID; if(rc==1)return PS2_EE_STEP_UNSUPPORTED; s->gpr[0]=0; return PS2_EE_STEP_OK;
+    if (rc == -1) return PS2_EE_STEP_INVALID;
+    if (rc == 1) return PS2_EE_STEP_UNSUPPORTED;
+    s->gpr[0] = 0;
+    return PS2_EE_STEP_OK;
 }
 
 ps2_ee_step_result_t ps2_ee_execute_memory_word(ps2_ee_state_t *s, ps2_ee_memory_t *mem, uint32_t insn)
