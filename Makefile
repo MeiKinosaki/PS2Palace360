@@ -32,7 +32,12 @@ validate:
 	@test -f src/ps2/ee_memory.c
 	@test -f tests/test_ee_state.c
 	@test -s tests/test_ee_state.c || { echo "ERRO: arquivo de testes ausente ou vazio."; exit 2; }
-	@for f in $(EE_SOURCES); do test -s "$f" || { echo "ERRO: módulo EE ausente ou vazio: $f"; exit 2; }; done
+	@test -s src/ps2/ee_state.c || { echo "ERRO: módulo EE ausente ou vazio: src/ps2/ee_state.c"; exit 2; }
+	@test -s src/ps2/ee_ops.c || { echo "ERRO: módulo EE ausente ou vazio: src/ps2/ee_ops.c"; exit 2; }
+	@test -s src/ps2/ee_immediate.c || { echo "ERRO: módulo EE ausente ou vazio: src/ps2/ee_immediate.c"; exit 2; }
+	@test -s src/ps2/ee_compare.c || { echo "ERRO: módulo EE ausente ou vazio: src/ps2/ee_compare.c"; exit 2; }
+	@test -s src/ps2/ee_decode.c || { echo "ERRO: módulo EE ausente ou vazio: src/ps2/ee_decode.c"; exit 2; }
+	@test -s src/ps2/ee_memory.c || { echo "ERRO: módulo EE ausente ou vazio: src/ps2/ee_memory.c"; exit 2; }
 	@test -s src/main.c || { echo "ERRO: src/main.c ausente ou vazio."; exit 2; }
 	@grep -Eq 'int[[:space:]]+main[[:space:]]*\(' src/main.c || { echo "ERRO: src/main.c não declara main()."; exit 2; }
 	@grep -Eq 'placeholder|not an Xbox 360 entrypoint yet' src/main.c && { echo "AVISO: src/main.c ainda é placeholder; XEX não representa runtime Xbox funcional."; } || true
