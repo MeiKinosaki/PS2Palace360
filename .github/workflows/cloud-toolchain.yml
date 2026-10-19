@@ -18,16 +18,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
       - name: Inspect project layout
         shell: bash
         run: |
           set -euo pipefail
           echo "Repository: ${GITHUB_REPOSITORY}"
           echo "Commit: ${GITHUB_SHA}"
-          find . -maxdepth 4 -type f -not -path './.git/*' -print | sort
+          echo "Workspace: $(pwd)"
+          echo "Git root: $(git rev-parse --show-toplevel)"
+          echo "Checked out: $(git rev-parse HEAD)"
+          echo "Tracked project files:"
+          git ls-files | sed -n '1,120p'
+          echo "Required path diagnostics:"
+          for path in Makefile src/ps2 tests; do
+            if [[ -e "$path" ]]; then echo "FOUND: $path"; else echo "MISSING: $path"; fi
+          done
           if [[ ! -f Makefile || ! -d src/ps2 || ! -d tests ]]; then
-            echo "::error::The repository does not yet contain the emulator source tree, Makefile, and tests."
-            echo "Upload the contents of the PS2Palace360 development ZIP to the repository root first."
+            echo "::error::Required project files are missing after checkout. See tracked-file and workspace diagnostics above."
             exit 1
           fi
       - name: Validate package
