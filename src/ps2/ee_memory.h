@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+typedef struct ps2_ee_memory ps2_ee_memory_t;
+
 /* v0.90b: detailed translation status codes. */
 enum {
     PS2_EE_TRANSLATE_OK = 0,
@@ -75,10 +77,10 @@ enum {
     PS2_EE_MEM_ERR_ACCESS = -3
 };
 
-typedef struct ps2_ee_memory {
+struct ps2_ee_memory {
     uint8_t *ram;
     size_t ram_size;
-} ps2_ee_memory_t;
+};
 
 /* Minimal EE virtual-to-physical translation scaffold (no TLB yet).
  * Returns 0 for supported direct segments, -1 for unsupported addresses.
