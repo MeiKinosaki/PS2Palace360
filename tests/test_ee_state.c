@@ -50,6 +50,7 @@ int main(void)
     s.gpr[1]=0; s.gpr[2]=UINT32_C(0x80000000);
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(8u<<11)|(1u<<6)|0x03u)==PS2_EE_STEP_OK);
     assert(s.gpr[8]==UINT64_C(0xffffffffc0000000));
+    s.gpr[1]=1; /* SRAV shift amount comes from rs, not shamt. */
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(9u<<11)|0x07u)==PS2_EE_STEP_OK);
     assert(s.gpr[9]==UINT64_C(0xffffffffc0000000));
     /* Variable 64-bit shifts */
