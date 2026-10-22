@@ -298,8 +298,17 @@ int ps2_ee_tlb_invalidate_all(ps2_ee_tlb_t *tlb)
 {
     unsigned i;
     if (tlb == 0) return PS2_EE_TLB_ERR_ARGUMENT;
-    for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i)
+    /* Flush the entry metadata as well as the valid bit. Keeping a stale
+     * virtual_page here makes translate() misreport an invalid entry after
+     * a full flush instead of reporting a genuine TLB miss. */
+    for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i) {
+        tlb->entries[i].virtual_page = 0;
+        tlb->entries[i].physical_page = 0;
+        tlb->entries[i].asid = 0;
         tlb->entries[i].valid = 0;
+        tlb->entries[i].dirty = 0;
+        tlb->entries[i].global = 0;
+    }
     return PS2_EE_TLB_OK;
 }
 
