@@ -54,7 +54,7 @@ int main(void)
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(9u<<11)|0x07u)==PS2_EE_STEP_OK);
     assert(s.gpr[9]==UINT64_C(0xffffffffc0000000));
     /* Variable 64-bit shifts */
-    s.gpr[1]=UINT64_C(0x100000001); s.gpr[2]=3;
+    s.gpr[1]=3; s.gpr[2]=UINT64_C(0x100000001); /* DSLLV uses rs as shift and rt as value. */
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(3u<<11)|0x14u)==PS2_EE_STEP_OK && s.gpr[3]==UINT64_C(0x800000008));
     s.gpr[1]=4; s.gpr[2]=UINT64_C(0x100000000);
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(4u<<11)|0x16u)==PS2_EE_STEP_OK && s.gpr[4]==UINT64_C(0x10000000));
