@@ -42,7 +42,7 @@ int main(void)
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(3u<<11)|0x2du)==PS2_EE_STEP_OK&&s.gpr[3]==UINT64_C(0x100000007));
     assert(ps2_ee_execute_word(&s,(2u<<16)|(4u<<11)|(1u<<6)|0x3cu)==PS2_EE_STEP_OK&&s.gpr[4]==UINT64_C(0xe00000000));
     /* Portable arithmetic-right-shift helper is exercised through SRA/DSRA paths. */
-    s.gpr[1]=UINT64_C(0x8000000000000000); s.gpr[2]=1;
+    s.gpr[1]=1; s.gpr[2]=UINT64_C(0x8000000000000000);
     assert(ps2_ee_execute_word(&s,(1u<<21)|(2u<<16)|(6u<<11)|0x17u)==PS2_EE_STEP_OK && s.gpr[6]==UINT64_C(0xc000000000000000));
     s.gpr[2]=UINT64_C(0x8000000000000000);
     assert(ps2_ee_execute_word(&s,(2u<<16)|(7u<<11)|(1u<<6)|0x3bu)==PS2_EE_STEP_OK && s.gpr[7]==UINT64_C(0xc000000000000000));
