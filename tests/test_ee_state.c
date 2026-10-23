@@ -180,7 +180,7 @@ int main(void)
     /* v0.104b: TLB-aware memory accessors. */
     { ps2_ee_tlb_t tlb; uint64_t value=0;
       ps2_ee_tlb_reset(&tlb);
-      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00401000), UINT32_C(0x00000020), 0, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00401000), UINT32_C(0x00000000), 0, 1, 1, 1) == PS2_EE_TLB_OK);
       assert(ps2_ee_mem_store_virtual_tlb(&mem, &tlb, UINT32_C(0x00401008), 4, UINT32_C(0xcafebabe)) == PS2_EE_MEM_OK);
       assert(ps2_ee_mem_load_virtual_tlb(&mem, &tlb, UINT32_C(0x00401008), 4, &value) == PS2_EE_MEM_OK && value == UINT32_C(0xcafebabe));
       assert(ps2_ee_mem_load_virtual_tlb(&mem, &tlb, UINT32_C(0x00402008), 4, &value) == PS2_EE_MEM_ERR_TRANSLATION);
