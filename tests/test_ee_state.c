@@ -138,8 +138,8 @@ int main(void)
     /* v0.109b: TLB valid-entry diagnostic count. */
     { ps2_ee_tlb_t tlb; ps2_ee_tlb_reset(&tlb);
       assert(ps2_ee_tlb_count_valid(&tlb) == 0);
-      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x1000), UINT32_C(0x3000), 0, 1, 1, 1) == PS2_EE_TLB_OK);
-      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x2000), UINT32_C(0x4000), 0, 0, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x1000), UINT32_C(0x3000), 0, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x2000), UINT32_C(0x4000), 0, 0, 1, 0) == PS2_EE_TLB_OK);
       assert(ps2_ee_tlb_count_valid(&tlb) == 1);
       assert(ps2_ee_tlb_invalidate_asid(&tlb, 0) == PS2_EE_TLB_OK);
       assert(ps2_ee_tlb_count_valid(&tlb) == 0);
