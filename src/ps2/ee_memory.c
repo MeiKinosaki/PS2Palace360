@@ -276,8 +276,22 @@ int ps2_ee_tlb_check_page(const ps2_ee_tlb_t *tlb, uint32_t virtual_address,
 {
     ps2_ee_tlb_entry_t entry;
     int status = ps2_ee_tlb_lookup(tlb, virtual_address, &entry);
+    if (status == PS2_EE_TLB_ERR_MISS) {
+        uint32_t page;
+        unsigned i;
+        if (tlb == 0) return PS2_EE_TLB_ERR_ARGUMENT;
+        page = virtual_address & ~(uint32_t)(PS2_EE_TLB_PAGE_SIZE - 1u);
+        /* Distinguish a programmed invalid entry from a genuine miss.
+         * Full invalidation clears metadata, so flushed slots won't match. */
+        for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i) {
+            const ps2_ee_tlb_entry_t *e = &tlb->entries[i];
+            if (!e->valid && e->virtual_page == page &&
+                (e->global || e->asid == tlb->current_asid))
+                return PS2_EE_TLB_ERR_INVALID;
+        }
+        return status;
+    }
     if (status != PS2_EE_TLB_OK) return status;
-    if (!entry.valid) return PS2_EE_TLB_ERR_INVALID;
     if (is_write && !entry.dirty) return PS2_EE_TLB_ERR_MODIFIED;
     return PS2_EE_TLB_OK;
 }
