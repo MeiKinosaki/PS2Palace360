@@ -218,7 +218,17 @@ int ps2_ee_tlb_invalidate_asid(ps2_ee_tlb_t *tlb, uint8_t asid)
     if (tlb == 0) return PS2_EE_TLB_ERR_ARGUMENT;
     for (i = 0; i < PS2_EE_TLB_ENTRY_COUNT; ++i) {
         ps2_ee_tlb_entry_t *e = &tlb->entries[i];
-        if (!e->global && e->asid == asid) e->valid = 0;
+        if (!e->global && e->asid == asid) {
+            /* An ASID flush removes the mapping, not just its valid bit;
+             * stale metadata must not be reported as a programmed invalid
+             * entry by the experimental translate() diagnostic. */
+            e->virtual_page = 0;
+            e->physical_page = 0;
+            e->asid = 0;
+            e->valid = 0;
+            e->dirty = 0;
+            e->global = 0;
+        }
     }
     return PS2_EE_TLB_OK;
 }
