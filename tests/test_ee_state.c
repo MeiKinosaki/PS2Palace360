@@ -422,7 +422,7 @@ int main(void)
           UINT32_C(0x00003000), 3, 1, 1, 1) == PS2_EE_TLB_OK);
       assert(ps2_ee_tlb_invalidate_asid(&tlb, 3) == PS2_EE_TLB_OK);
       /* ASID-specific mapping is invalidated, global mapping survives. */
-      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00400010), 0, &physical) == PS2_EE_TLB_ERR_INVALID);
+      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00400010), 0, &physical) == PS2_EE_TLB_ERR_MISS);
       assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00401010), 0, &physical) == PS2_EE_TLB_OK);
       assert(physical == UINT32_C(0x00003010));
       assert(ps2_ee_tlb_invalidate_all(&tlb) == PS2_EE_TLB_OK);
