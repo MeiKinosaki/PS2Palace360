@@ -298,3 +298,11 @@ O plano de dez milhões de tarefas é documentado em [`docs/PLANO_10000000_ETAPA
 ## Plano operacional de 5.000 etapas
 
 O recorte operacional de 5.000 etapas e seus critérios de aceite estão em [`docs/PLANO_5000_ETAPAS.md`](docs/PLANO_5000_ETAPAS.md). Gere o CSV com o script paginado; todas as tarefas começam pendentes. O plano prioriza primeiro build/testes e correções de TLB/exceções antes de subsistemas maiores.
+
+
+## V2.0.24b — protótipo isolado de temporizador EE
+
+- Adicionados `src/ps2/ee_timer.h` e `src/ps2/ee_timer.c`, com reset, configuração, avanço de contador, detecção experimental de cruzamento do compare e reconhecimento/acknowledgement de IRQ pendente.
+- Adicionado `tests/test_ee_timer.c` cobrindo reset, temporizador desabilitado, cruzamento do compare, wraparound de 32 bits, acknowledgement e argumentos nulos.
+- O workflow **Host validation** passou no commit `1c422f0ac0305b4de92e47587446c5579a5f218c`: [execução 40833776039](https://github.com/MeiKinosaki/PS2Palace360/actions/runs/40833776039).
+- **Limitação importante:** é um modelo genérico experimental, ainda não fiel ao hardware de temporizadores do PS2 e não integrado ao scheduler/CP0 do EE. O workflow de toolchain Xenon falhou porque o runner não dispõe de `xenon-gcc`; não foi gerado nem validado `build/default.xex`. O entrypoint Xbox continua sendo placeholder.
