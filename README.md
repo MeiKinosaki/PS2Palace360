@@ -4,7 +4,7 @@ Emulador experimental de PlayStation 2 para Xbox 360.
 
 ## Versão de desenvolvimento
 
-**Pacote de desenvolvimento: V2.0.22b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
+**Pacote de desenvolvimento: V2.0.23b** — identificador da rodada de trabalho; não indica compatibilidade completa nem versão estável do emulador.
 
 ### V2.0.21b — regressões adicionais de memória e TLB
 
@@ -13,6 +13,10 @@ Adicionados testes ao conjunto de host para rejeição de acessos desalinhados, 
 ### V2.0.22b — entrada inicial em exceção para falha no fetch via TLB
 
 O estado EE agora mantém um campo experimental `badvaddr`. O passo de execução com TLB distingue falha de tradução durante busca de instrução (gera entrada no helper com código TLBL) de endereço físico que não pode ser lido no buffer de teste (usa o código experimental IBE), e há um teste para o caso de TLB miss no fetch, verificando BadVAddr, EPC, Cause.ExcCode e vetor. Isto não implementa ainda a precisão completa do CP0/R5900, delay slots, nem a entrega correta de exceções de acessos de dados; os testes adicionados ainda precisam de execução CI confirmada.
+
+### V2.0.23b — regressões de invalidação TLB verificadas no host
+
+Adicionados testes para invalidação por ASID, preservação de mapeamento global durante a invalidação por ASID, invalidação completa e preservação do endereço físico de saída em uma falha de tradução. A primeira expectativa do novo teste foi corrigida após a CI revelar que uma entrada invalidada resulta em MISS. A validação nativa passou no commit `2f4ac8620c8e397766c45bb622a0a4d3dd2e2187`. A compilação Xbox 360 continua bloqueada porque o runner não encontrou `xenon-gcc`; nenhum `default.xex` foi confirmado nesta rodada.
 
 ## Núcleo Emotion Engine (EE)
 
