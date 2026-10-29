@@ -411,5 +411,24 @@ int main(void)
       assert(((s.cause >> 2) & 31u) == PS2_EE_EXC_TLBL);
       assert(s.pc == UINT32_C(0x80000180));
     }
+    /* V2.0.23b candidate: ASID invalidation and global-entry regressions. */
+    {
+      ps2_ee_tlb_t tlb;
+      uint32_t physical = UINT32_C(0xdeadbeef);
+      ps2_ee_tlb_reset(&tlb);
+      assert(ps2_ee_tlb_write(&tlb, 0, UINT32_C(0x00400000),
+          UINT32_C(0x00002000), 3, 1, 1, 0) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_write(&tlb, 1, UINT32_C(0x00401000),
+          UINT32_C(0x00003000), 3, 1, 1, 1) == PS2_EE_TLB_OK);
+      assert(ps2_ee_tlb_invalidate_asid(&tlb, 3) == PS2_EE_TLB_OK);
+      /* ASID-specific mapping is invalidated, global mapping survives. */
+      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00400010), 0, &physical) == PS2_EE_TLB_ERR_INVALID);
+      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00401010), 0, &physical) == PS2_EE_TLB_OK);
+      assert(physical == UINT32_C(0x00003010));
+      assert(ps2_ee_tlb_invalidate_all(&tlb) == PS2_EE_TLB_OK);
+      physical = UINT32_C(0xdeadbeef);
+      assert(ps2_ee_tlb_translate(&tlb, UINT32_C(0x00401010), 0, &physical) == PS2_EE_TLB_ERR_MISS);
+      assert(physical == UINT32_C(0xdeadbeef));
+    }
     puts("OK: EE helpers, decoder, TLB-backed step, scalar memory ops and arithmetic tests.");return 0;
 }
