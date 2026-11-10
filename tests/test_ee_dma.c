@@ -25,7 +25,7 @@ int main(void)
 
     assert(ps2_ee_dma_start(&dma, 0, 4, 8) == PS2_EE_DMA_OK);
     assert(ps2_ee_dma_step(&dma, memory, sizeof(memory), 8) == PS2_EE_DMA_OK);
-    for (i = 0; i < 8; ++i) assert(memory[4 + i] == (uint8_t)(16 + i));
+    for (i = 0; i < 8; ++i) assert(memory[4 + i] == (uint8_t)i);
 
     assert(ps2_ee_dma_start(&dma, 28, 0, 8) == PS2_EE_DMA_OK);
     assert(ps2_ee_dma_step(&dma, memory, sizeof(memory), 8) == PS2_EE_DMA_ERR_RANGE);
