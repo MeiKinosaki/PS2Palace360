@@ -7,6 +7,8 @@ XENON_CFLAGS ?= -O2 -Wall -Wextra
 EE_SOURCES := src/ps2/ee_state.c src/ps2/ee_ops.c src/ps2/ee_immediate.c src/ps2/ee_compare.c src/ps2/ee_decode.c src/ps2/ee_memory.c
 TIMER_SOURCE := src/ps2/ee_timer.c
 TIMER_TEST := $(BUILD_DIR)/test_ee_timer
+DMA_SOURCE := src/ps2/ee_dma.c
+DMA_TEST := $(BUILD_DIR)/test_ee_dma
 HOST_TEST := $(BUILD_DIR)/test_ee_state
 
 .PHONY: all validate test-host check toolchain-check xex clean
@@ -23,6 +25,9 @@ $(HOST_TEST): $(EE_SOURCES) tests/test_ee_state.c src/ps2/ee_state.h src/ps2/ee_
 $(TIMER_TEST): $(TIMER_SOURCE) tests/test_ee_timer.c src/ps2/ee_timer.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -Isrc/ps2 $(TIMER_SOURCE) tests/test_ee_timer.c -o $@
 
+$(DMA_TEST): $(DMA_SOURCE) tests/test_ee_dma.c src/ps2/ee_dma.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -Isrc/ps2 $(DMA_SOURCE) tests/test_ee_dma.c -o $@
+
 validate:
 	@test -f src/ps2/ee_state.h
 	@test -f src/ps2/ee_state.c
@@ -38,6 +43,9 @@ validate:
 	@test -f src/ps2/ee_timer.h
 	@test -f src/ps2/ee_timer.c
 	@test -f tests/test_ee_timer.c
+	@test -f src/ps2/ee_dma.h
+	@test -f src/ps2/ee_dma.c
+	@test -f tests/test_ee_dma.c
 	@test -f src/ps2/ee_memory.c
 	@test -f tests/test_ee_state.c
 	@test -s tests/test_ee_state.c || { echo "ERRO: arquivo de testes ausente ou vazio."; exit 2; }
@@ -52,9 +60,10 @@ validate:
 	@grep -Eq 'placeholder|not an Xbox 360 entrypoint yet' src/main.c && { echo "AVISO: src/main.c ainda é placeholder; XEX não representa runtime Xbox funcional."; } || true
 	@echo "OK: arquivos mínimos e entrypoint main() presentes (sem validar runtime Xbox)."
 
-test-host: $(HOST_TEST) $(TIMER_TEST)
+test-host: $(HOST_TEST) $(TIMER_TEST) $(DMA_TEST)
 	./$(HOST_TEST)
 	./$(TIMER_TEST)
+	./$(DMA_TEST)
 
 check: validate test-host
 
