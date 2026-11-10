@@ -306,3 +306,11 @@ O recorte operacional de 5.000 etapas e seus critérios de aceite estão em [`do
 - Adicionado `tests/test_ee_timer.c` cobrindo reset, temporizador desabilitado, cruzamento do compare, wraparound de 32 bits, acknowledgement e argumentos nulos.
 - O workflow **Host validation** passou no commit `1c422f0ac0305b4de92e47587446c5579a5f218c`: [execução 40833776039](https://github.com/MeiKinosaki/PS2Palace360/actions/runs/40833776039).
 - **Limitação importante:** é um modelo genérico experimental, ainda não fiel ao hardware de temporizadores do PS2 e não integrado ao scheduler/CP0 do EE. O workflow de toolchain Xenon falhou porque o runner não dispõe de `xenon-gcc`; não foi gerado nem validado `build/default.xex`. O entrypoint Xbox continua sendo placeholder.
+
+
+## V2.0.25b — protótipo isolado de DMA EE e regressão aprovada
+
+- Adicionados `src/ps2/ee_dma.h` e `src/ps2/ee_dma.c`: canal experimental com início, transferência em blocos, conclusão, validação de limites e cópia segura para regiões sobrepostas dentro de uma memória linear fornecida pelo chamador.
+- Adicionado `tests/test_ee_dma.c` e integrado ao alvo `make test-host`.
+- A primeira execução encontrou uma expectativa incorreta no teste de sobreposição; a asserção foi corrigida. A execução seguinte passou: [Host validation — run 42864047078](https://github.com/MeiKinosaki/PS2Palace360/actions/runs/42864047078). O log confirma que os testes EE, timer e DMA terminaram com sucesso.
+- **Limitações:** este DMA é um modelo de cópia genérico, não implementa os dez canais DMA do PS2, registradores MADR/QWC/CHCR/TADR, prioridades, interrupções, cadeia de tags, arbitragem ou integração com IOP/GS. O workflow Xenon continua falhando por indisponibilidade de `xenon-gcc`; nenhum ELF Xenon ou `default.xex` foi produzido/validado.
